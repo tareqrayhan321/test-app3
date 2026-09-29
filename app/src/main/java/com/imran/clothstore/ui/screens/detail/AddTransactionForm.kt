@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imran.clothstore.ui.components.AppDateField
+import com.imran.clothstore.ui.components.AppTextField
 import com.imran.clothstore.ui.theme.AppColors
 
 /**
@@ -84,24 +86,16 @@ private fun BokeyoaMiniForm(
             .padding(10.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(memo, { memo = it }, label = { Text("ম্যামো") }, modifier = Modifier.weight(1f), singleLine = true)
-            OutlinedTextField(date, { date = it }, label = { Text("তারিখ") }, modifier = Modifier.weight(1f), singleLine = true)
+            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
+            AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(
-                bill, { bill = it }, label = { Text("বিল/বকেয়া") },
-                modifier = Modifier.weight(1f), singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-            OutlinedTextField(goj, { goj = it }, label = { Text("গজ") }, modifier = Modifier.weight(1f), singleLine = true)
+            AppTextField(bill, { bill = it }, "বিল/বকেয়া", Modifier.weight(1f), KeyboardType.Decimal)
+            AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f))
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(
-                joma, { joma = it }, label = { Text("সাথে জমা (ঐচ্ছিক)") },
-                modifier = Modifier.weight(1f), singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-            OutlinedTextField(note, { note = it }, label = { Text("মন্তব্য") }, modifier = Modifier.weight(1f), singleLine = true)
+            AppTextField(joma, { joma = it }, "সাথে জমা (ঐচ্ছিক)", Modifier.weight(1f), KeyboardType.Decimal)
+            AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
         }
         Button(
             onClick = { onSave(memo, date, goj, bill.toDoubleOrNull() ?: 0.0, note, joma.toDoubleOrNull() ?: 0.0) },
@@ -130,16 +124,12 @@ private fun JomaMiniForm(
             .padding(10.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(memo, { memo = it }, label = { Text("ম্যামো") }, modifier = Modifier.weight(1f), singleLine = true)
-            OutlinedTextField(date, { date = it }, label = { Text("তারিখ") }, modifier = Modifier.weight(1f), singleLine = true)
+            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
+            AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(
-                joma, { joma = it }, label = { Text("জমা") },
-                modifier = Modifier.weight(1f), singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
-            )
-            OutlinedTextField(note, { note = it }, label = { Text("মন্তব্য") }, modifier = Modifier.weight(1f), singleLine = true)
+            AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
+            AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
         }
         Button(
             onClick = { onSave(memo, date, joma.toDoubleOrNull() ?: 0.0, note) },
