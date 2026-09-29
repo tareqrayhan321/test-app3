@@ -36,7 +36,7 @@ fun SideMenu(
         modifier = Modifier
             .fillMaxHeight()
             .width(280.dp)
-            .background(Color.White)
+            .background(AppColors.HeaderTeal)
     ) {
         Row(
             modifier = Modifier
@@ -44,27 +44,24 @@ fun SideMenu(
                 .background(
                     androidx.compose.ui.graphics.Brush.verticalGradient(
                         listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
-                    ),
-                    RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
+                    )
                 )
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("মেনু", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "✕",
-                color = Color.White,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = onClose)
-                    .padding(6.dp)
-            )
         }
 
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color.White)
+                .padding(12.dp)
+        ) {
             MenuItem("🏠", "হোম", onNavigateHome)
         }
     }
