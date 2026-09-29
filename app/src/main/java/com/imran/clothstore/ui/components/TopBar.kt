@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -140,69 +141,81 @@ fun AppTopBar(
     notifBadgeCount: Int = 0,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                androidx.compose.ui.graphics.Brush.verticalGradient(
-                    listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
-                ),
-                androidx.compose.foundation.shape.RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
-            )
-            .statusBarsPadding()
-            .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = HeaderBottomPadding),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                imageVector = StoreLogoIcon,
-                contentDescription = null,
-                modifier = Modifier.size(width = 40.dp, height = 30.dp)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Column {
-                Text(
-                    text = "ইমরান ক্লথ স্টোর",
-                    color = Color.White,
-                    fontSize = 19.sp,
-                    fontFamily = AlinurFontFamily,
-                    fontWeight = FontWeight.Normal
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    )
                 )
-                Text(
-                    text = "পাওনা লিস্ট, ক্যাশফ্লো, প্রফিট-লস",
-                    color = Color.White.copy(alpha = 0.75f),
-                    fontSize = 12.sp
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = HeaderBottomPadding),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    imageVector = StoreLogoIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(width = 40.dp, height = 30.dp)
                 )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column {
+                    Text(
+                        text = "ইমরান ক্লথ স্টোর",
+                        color = Color.White,
+                        fontSize = 19.sp,
+                        fontFamily = AlinurFontFamily,
+                        fontWeight = FontWeight.Normal
+                    )
+                    Text(
+                        text = "পাওনা লিস্ট, ক্যাশফ্লো, প্রফিট-লস",
+                        color = Color.White.copy(alpha = 0.75f),
+                        fontSize = 12.sp
+                    )
+                }
             }
-        }
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box {
-                IconButton(onClick = onNotifClick) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box {
+                    IconButton(onClick = onNotifClick) {
+                        Icon(
+                            imageVector = Icons.Filled.Notifications,
+                            contentDescription = "নোটিফিকেশন",
+                            tint = Color.White
+                        )
+                    }
+                    if (notifBadgeCount > 0) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 10.dp, end = 10.dp)
+                                .size(10.dp)
+                                .background(Color(0xFFE53935), CircleShape)
+                                .align(Alignment.TopEnd)
+                        )
+                    }
+                }
+                IconButton(onClick = onMenuClick) {
                     Icon(
-                        imageVector = Icons.Filled.Notifications,
-                        contentDescription = "নোটিফিকেশন",
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "মেনু",
                         tint = Color.White
                     )
                 }
-                if (notifBadgeCount > 0) {
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 10.dp, end = 10.dp)
-                            .size(10.dp)
-                            .background(Color(0xFFE53935), CircleShape)
-                            .align(Alignment.TopEnd)
-                    )
-                }
-            }
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = "মেনু",
-                    tint = Color.White
-                )
             }
         }
+        // নিচের সাদা/বডি শিট — হেডারের উপর উঠে এসেছে, উপরের কোণ গোলাকার
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(28.dp)
+                .background(
+                    AppColors.BodyBg,
+                    androidx.compose.foundation.shape.RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+                )
+        )
     }
 }
