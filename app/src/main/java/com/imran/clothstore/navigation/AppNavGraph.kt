@@ -87,6 +87,8 @@ fun AppNavGraph(
                 onAggregateReportClick = { navController.navigate(Routes.AGGREGATE_REPORT) },
                 onPLTrendsClick = { navController.navigate(Routes.PL_TRENDS) },
                 onFabricClick = { navController.navigate(Routes.FABRIC) },
+                onPartyClick = { navController.navigate(Routes.DEBTORS_LIST) },
+                onDbConnectClick = { navController.navigate(Routes.DB_CONNECT) },
                 viewModel = homeViewModel,
                 notifViewModel = notifViewModel
             )
@@ -198,14 +200,6 @@ fun AppNavGraph(
                 onClose = { navController.popBackStack() },
                 onNavigateHome = {
                     navController.popBackStack(Routes.HOME, inclusive = false)
-                },
-                onNavigateDebtorsList = {
-                    navController.popBackStack()
-                    navController.navigate(Routes.DEBTORS_LIST)
-                },
-                onNavigateDbConnect = {
-                    navController.popBackStack()
-                    navController.navigate(Routes.DB_CONNECT)
                 }
             )
         }
