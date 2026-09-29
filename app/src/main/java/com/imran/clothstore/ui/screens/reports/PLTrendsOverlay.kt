@@ -54,12 +54,12 @@ fun PLTrendsOverlay(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFFAF9F5))
+                .background(Color.White)
                 .statusBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 22.dp)
         ) {

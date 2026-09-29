@@ -69,7 +69,7 @@ fun PaikkariCalculatorScreen(
         ModalBottomSheet(
             onDismissRequest = onBack,
             sheetState = sheetState,
-            containerColor = Color(0xFFFAF9F5),
+            containerColor = Color.White,
             dragHandle = {
                 Box(
                     modifier = Modifier
@@ -145,7 +145,7 @@ fun PaikkariCalculatorScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFFAF9F5))
+                .background(Color.White)
         ) {
             Row(
                 modifier = Modifier

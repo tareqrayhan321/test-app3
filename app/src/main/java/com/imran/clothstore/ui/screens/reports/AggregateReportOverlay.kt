@@ -97,7 +97,7 @@ fun AggregateReportOverlay(
                 .weight(1f)
                 .fillMaxWidth()
                 .clip(androidx.compose.foundation.shape.RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color(0xFFFAF9F5))
+                .background(Color.White)
         ) {
         if (reports.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

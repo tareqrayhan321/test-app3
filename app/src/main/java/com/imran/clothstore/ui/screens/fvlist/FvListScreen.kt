@@ -64,7 +64,7 @@ fun FvListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(Color.White)
     ) {
         // ── হেডার (ক্রিম, রেফারেন্স অনুযায়ী) ──
         Column(
@@ -115,8 +115,8 @@ fun FvListScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFFAF9F5),
-                    unfocusedContainerColor = Color(0xFFFAF9F5),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
                     focusedBorderColor = Color(0xFFD9D2C0),
                     unfocusedBorderColor = Color(0xFFE2D9C4)
                 )

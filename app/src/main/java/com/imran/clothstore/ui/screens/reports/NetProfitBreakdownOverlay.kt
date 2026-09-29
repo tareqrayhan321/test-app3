@@ -47,7 +47,7 @@ fun NetProfitBreakdownOverlay(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier

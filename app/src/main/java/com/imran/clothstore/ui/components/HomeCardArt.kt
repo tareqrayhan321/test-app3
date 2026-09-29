@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.imran.clothstore.R
 
 /**
  * মূল ওয়েব অ্যাপে প্রতিটা হোম কার্ডের একটা হাতে-আঁকা inline SVG আইকন ছিল
@@ -745,53 +747,24 @@ fun ReportArt(modifier: Modifier = Modifier) {
 }
 
 
-/** কার্ড ৯: ডাটাবেইজ সংযোগ — সিলিন্ডার ডাটাবেইজ + সবুজ চেকমার্ক */
+/** কার্ড ৯: ডাটাবেইজ — Material Symbols "database_upload" */
 @Composable
 fun DatabaseArt(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier.size(56.dp)) {
-        val s = scale(size.minDimension)
-        fun dp(v: Float) = v * s
-
-        drawOval(
-            color = Color.Black.copy(alpha = 0.10f),
-            topLeft = Offset(dp(12f), dp(56f)),
-            size = androidx.compose.ui.geometry.Size(dp(40f), dp(6f))
-        )
-        // সিলিন্ডার বডি
-        drawRoundRect(
-            color = Color(0xFF3B82F6),
-            topLeft = Offset(dp(12f), dp(14f)),
-            size = androidx.compose.ui.geometry.Size(dp(40f), dp(32f)),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(dp(6f))
-        )
-        // উপরের ঢাকনা
-        drawOval(
-            color = Color(0xFF7FB2FF),
-            topLeft = Offset(dp(12f), dp(5.5f)),
-            size = androidx.compose.ui.geometry.Size(dp(40f), dp(17f))
-        )
-        // সবুজ চেক ব্যাজ
-        drawCircle(Color(0xFF22C55E), radius = dp(9.5f), center = Offset(dp(50f), dp(50f)))
-    }
+    Image(
+        painter = painterResource(id = R.drawable.ic_database_upload),
+        contentDescription = null,
+        modifier = modifier.size(56.dp),
+        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color(0xFF3B82F6))
+    )
 }
 
-/** কার্ড ১০: পার্টি — দুইটা পতাকা + গিফট বক্স স্টাইল মুখ */
+/** কার্ড ১০: পার্টি — Material Symbols "groups" */
 @Composable
 fun PartyArt(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier.size(56.dp)) {
-        val s = scale(size.minDimension)
-        fun dp(v: Float) = v * s
-
-        drawOval(
-            color = Color.Black.copy(alpha = 0.10f),
-            topLeft = Offset(dp(10f), dp(56f)),
-            size = androidx.compose.ui.geometry.Size(dp(44f), dp(6f))
-        )
-        // দুই দিকের রঙিন ব্যানার
-        drawCircle(Color(0xFF3B82F6), radius = dp(11f), center = Offset(dp(12f), dp(30f)))
-        drawCircle(Color(0xFFF08A3C), radius = dp(11f), center = Offset(dp(52f), dp(30f)))
-        // কেন্দ্রীয় মুখ
-        drawCircle(Color(0xFFFFD6A8), radius = dp(14f), center = Offset(dp(32f), dp(32f)))
-    }
+    Image(
+        painter = painterResource(id = R.drawable.ic_groups),
+        contentDescription = null,
+        modifier = modifier.size(56.dp),
+        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color(0xFFF08A3C))
+    )
 }
-

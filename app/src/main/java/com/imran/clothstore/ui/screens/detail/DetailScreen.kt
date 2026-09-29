@@ -58,7 +58,7 @@ fun DetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(Color.White)
     ) {
         // ── হেডার (ক্রিম, রেফারেন্স অনুযায়ী) ──
         Row(

@@ -46,7 +46,7 @@ fun DlQuickJomaDialog(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFFAF9F5), RoundedCornerShape(14.dp))
+                .background(Color.White, RoundedCornerShape(14.dp))
         ) {
             // হেডার — সবুজ গ্রেডিয়েন্টের বদলে সলিড টোন (Compose-এ সহজ gradient ব্যবহার করা যায়, তবে এখানে flat রাখা হলো)
             Column(

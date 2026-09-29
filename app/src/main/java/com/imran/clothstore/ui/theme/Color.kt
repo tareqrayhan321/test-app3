@@ -20,7 +20,7 @@ object AppColors {
     val ThemeColor = Color(0xFF00363A) // manifest.json theme-color এর সাথে মিল রেখে
 
     // ── বেস ব্যাকগ্রাউন্ড ──
-    val BodyBg = Color(0xFFFAF9F5)
+    val BodyBg = Color(0xFFFFFFFF)
     val TextPrimary = Color(0xFF141413)
 
     // ── ওয়েব অ্যাপের হোম কার্ড থিম — ক্রিম/বেইজ ব্যাকগ্রাউন্ড + সোনালি বর্ডার ──

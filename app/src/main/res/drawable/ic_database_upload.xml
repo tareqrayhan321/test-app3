@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ডাটাবেইজ হোম কার্ডের আইকন: ডাটাবেইজ সিলিন্ডার + আপলোড অ্যারো -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <group
+            android:pivotY="-840"
+            android:scaleY="0.6">
+            <path
+                android:fillColor="#000000"
+                android:pathData="M480-120q-151 0-255.5-46.5T120-280v-400q0-66 105.5-113T480-840q149 0 254.500 47T840-680v400q0 67-104.500 113.500T480-120Zm0-479q89 0 179-25.500T760-679q-11-29-100.500-55T480-760q-91 0-178.500 25.500T200-679q14 29 101.500 54.500T480-599Zm0 199q42 0 81-4t74.500-11.500q35.500-7.500 67-18.500t57.500-25v-120q-26 14-57.500 25t-67 18.500Q600-528 561-524t-81 4q-42 0-82-4t-75.500-11.500Q287-543 256-554t-56-25v120q25 14 56 25t66.500 18.500Q358-408 398-404t82 4Zm0 200q46 0 93.500-7t87.500-18.500q40-11.500 67-26t32-29.500v-98q-26 14-57.500 25t-67 18.500Q600-328 561-324t-81 4q-42 0-82-4t-75.500-11.500Q287-343 256-354t-56-25v99q5 15 31.500 29t66.500 25.500q40 11.500 88 18.500t94 7Z" />
+        </group>
+    </group>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M480 600L610 730H520V880H440V730H350Z" />
+</vector>
