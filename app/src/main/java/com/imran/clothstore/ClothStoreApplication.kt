@@ -36,18 +36,17 @@ class ClothStoreApplication : Application() {
         try {
             val auth = FirebaseAuth.getInstance()
             if (auth.currentUser != null) {
-                SyncWorker.schedulePeriodic(applicationContext)
-                startBackupListener()
+                startAuthenticatedSync()
             } else {
                 auth.signInAnonymously()
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d(TAG, "signInAnonymously: success, uid=${auth.currentUser?.uid}")
-                            startBackupListener()
+                            startAuthenticatedSync()
                         } else {
                             Log.w(TAG, "signInAnonymously: failed", task.exception)
+                            SyncWorker.schedulePeriodic(applicationContext)
                         }
-                        SyncWorker.schedulePeriodic(applicationContext)
                     }
             }
         } catch (e: Exception) {
@@ -55,6 +54,15 @@ class ClothStoreApplication : Application() {
             // Firebase না থাকলেও অন্তত পিরিয়ডিক সিঙ্ক শিডিউল হোক (যদিও ফায়ারস্টোর ফেইল করবে, লোকাল চলবে)
             SyncWorker.schedulePeriodic(applicationContext)
         }
+    }
+
+    /** Auth সম্পন্ন হলে listener এবং cold-start pull—দুটোই চালু করে। */
+    private fun startAuthenticatedSync() {
+        SyncWorker.schedulePeriodic(applicationContext)
+        startBackupListener()
+        // নতুন install-এর Room cache খালি থাকে; initial listener event-এর অপেক্ষা না করে
+        // বিদ্যমান Firestore document-টি স্পষ্টভাবে pull করার অনুরোধ করা হয়।
+        SyncWorker.triggerImmediate(applicationContext)
     }
 
     /** Remote document পরিবর্তনে বিদ্যমান Room/WorkManager sync-কে জাগিয়ে তোলে। */
