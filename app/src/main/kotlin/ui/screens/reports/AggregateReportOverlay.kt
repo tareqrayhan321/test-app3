@@ -1,5 +1,6 @@
 package com.imran.clothstore.ui.screens.reports
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -41,6 +42,7 @@ import com.imran.clothstore.ui.theme.AppColors
  * প্রতিটা সপ্তাহের রিপোর্ট এক রো — ইন-স্টক, আউট-স্টক, নেট, গ্রস, ক্যাশ-ইন, ক্যাশ-আউট।
  * লং-প্রেসে ডিলিট মোড চালু হয় (aggOvToggleDelMode এর সমতুল্য)।
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AggregateReportOverlay(
     onClose: () -> Unit,
@@ -157,6 +159,7 @@ fun AggregateReportOverlay(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AggReportRow(
     report: WeeklyReport,

@@ -1,5 +1,6 @@
 package com.imran.clothstore.ui.screens.fvlist
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,6 +46,7 @@ import com.imran.clothstore.util.formatTaka
  * তার নিচে বাকির পরিমাণ। সাধারণ ট্যাপে ডিটেইল খোলে, লং-প্রেসে এডিট/ডিলিট অ্যাকশন বার দেখায়।
  * (কল = ডায়ালার, WhatsApp = wa.me লিংক — বাটনের আচরণ রেফারেন্সে দেখা যায়নি, যুক্তিসঙ্গত অনুমান)
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntryRowCard(
     entry: Entry,
