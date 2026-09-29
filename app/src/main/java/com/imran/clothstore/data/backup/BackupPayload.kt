@@ -1,5 +1,6 @@
 package com.imran.clothstore.data.backup
 
+import com.google.firebase.firestore.PropertyName
 import kotlinx.serialization.Serializable
 
 /**
@@ -21,10 +22,18 @@ data class BackupPayload(
     val updatedAt: Long = System.currentTimeMillis(),
 
     // ── is_c1_list .. is_c4_list: চারটা এন্ট্রি ক্যাটাগরি (id-ভিত্তিক merge) ──
-    val is_c1_list: List<BackupEntry> = emptyList(), // রেগুলার কাস্টমার
-    val is_c2_list: List<BackupEntry> = emptyList(), // ইর-রেগুলার কাস্টমার
-    val is_c3_list: List<BackupEntry> = emptyList(), // রেগুলার মহাজন
-    val is_c4_list: List<BackupEntry> = emptyList(), // ইর-রেগুলার মহাজন
+    @get:PropertyName("is_c1_list")
+    @set:PropertyName("is_c1_list")
+    var is_c1_list: List<BackupEntry> = emptyList(), // রেগুলার কাস্টমার
+    @get:PropertyName("is_c2_list")
+    @set:PropertyName("is_c2_list")
+    var is_c2_list: List<BackupEntry> = emptyList(), // ইর-রেগুলার কাস্টমার
+    @get:PropertyName("is_c3_list")
+    @set:PropertyName("is_c3_list")
+    var is_c3_list: List<BackupEntry> = emptyList(), // রেগুলার মহাজন
+    @get:PropertyName("is_c4_list")
+    @set:PropertyName("is_c4_list")
+    var is_c4_list: List<BackupEntry> = emptyList(), // ইর-রেগুলার মহাজন
 
     // ── fabricPurchaseData_v2: কাপড় ক্রয় গ্রুপ (id-ভিত্তিক merge) ──
     val fabricPurchaseData_v2: List<BackupFabricGroup> = emptyList(),
@@ -36,7 +45,9 @@ data class BackupPayload(
     val profitStripData_v1: ProfitStripData? = null,
 
     // ── is_deleted_ids: প্রতিটা key অনুযায়ী ডিলিট হওয়া id-দের তালিকা (tombstone) ──
-    val is_deleted_ids: Map<String, List<Long>> = emptyMap()
+    @get:PropertyName("is_deleted_ids")
+    @set:PropertyName("is_deleted_ids")
+    var is_deleted_ids: Map<String, List<Long>> = emptyMap()
 )
 
 /** ওয়েব অ্যাপের KPI স্ট্রিপে দেখানো Weekly Gross/Net Profit */
