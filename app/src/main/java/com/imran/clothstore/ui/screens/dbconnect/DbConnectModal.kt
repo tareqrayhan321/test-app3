@@ -1,13 +1,14 @@
 package com.imran.clothstore.ui.screens.dbconnect
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -56,26 +57,24 @@ fun DbConnectModal(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF241505))
+            .background(Color.White)
     ) {
-        Row(
+        // ── হেডার: স্ট্যাটাস বারের নিচে টাইটেল + হালকা ডিভাইডার (ব্যাক করতে সিস্টেম ব্যাক ব্যবহার হবে) ──
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 22.dp, bottom = 16.dp)
         ) {
-            Text("ফায়ারবেস ডাটাবেইজ", color = Color(0xFFE0B84A), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "✕",
-                color = Color.White,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable(onClick = onClose)
-                    .padding(8.dp)
-            )
+            Text("ফায়ারবেস ডাটাবেইজ", color = Color(0xFF00363A), fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color(0xFFE3E6E6))
+        )
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(14.dp))
 
         // ── স্ট্যাটাস বার ──
         Row(
@@ -83,7 +82,7 @@ fun DbConnectModal(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFF34220F))
+                .background(Color(0xFFF3F6F6))
                 .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -105,12 +104,12 @@ fun DbConnectModal(
                         DbConnectionState.CONNECTING -> "সংযোগ যাচাই করা হচ্ছে…"
                         DbConnectionState.ERROR -> "সংযোগ ব্যর্থ"
                     },
-                    color = Color(0xFFF0EAD8),
+                    color = Color(0xFF1A1A1A),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 if (lastSyncText.isNotBlank()) {
-                    Text(lastSyncText, color = Color(0xFF8A7A60), fontSize = 10.5.sp, modifier = Modifier.padding(top = 2.dp))
+                    Text(lastSyncText, color = Color(0xFF6C6A64), fontSize = 10.5.sp, modifier = Modifier.padding(top = 2.dp))
                 }
             }
         }
@@ -121,12 +120,12 @@ fun DbConnectModal(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 10.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF1E3A4A))
+                .background(Color(0xFFE8F3F8))
                 .padding(12.dp)
         ) {
             Text(
                 "এই অ্যাপ ও ওয়েব অ্যাপ একই ডেটা শেয়ার করে",
-                color = Color(0xFF9FD3E8),
+                color = Color(0xFF1E5A75),
                 fontSize = 11.5.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -135,7 +134,7 @@ fun DbConnectModal(
                     "ওয়েব অ্যাপ থেকে যা ইতিমধ্যে আছে, এই অ্যাপ সেটাই সরাসরি দেখায় ও আপডেট করে — " +
                     "আলাদা করে ইম্পোর্ট/এক্সপোর্ট করার দরকার নেই। শুধু নিশ্চিত করুন এই অ্যাপ ও ওয়েব " +
                     "অ্যাপ একই Firebase প্রজেক্টে কানেক্ট করা আছে।",
-                color = Color(0xFFBFDCE8),
+                color = Color(0xFF3E5F6E),
                 fontSize = 10.5.sp,
                 lineHeight = 15.sp,
                 modifier = Modifier.padding(top = 4.dp)
@@ -170,7 +169,7 @@ fun DbConnectModal(
                 text = "সাবধান: এটি Firestore-এর সব কাস্টমার/মহাজন এন্ট্রি, কাপড় ক্রয় তালিকা, ও " +
                     "সাপ্তাহিক রিপোর্ট স্থায়ীভাবে মুছে ফেলবে (imran_store/backup পুরো খালি হয়ে যাবে)। " +
                     "এই কাজ ফিরিয়ে আনা যাবে না। ওয়েব অ্যাপও একই ডেটা হারাবে যেহেতু দুটো অ্যাপ একই নথি শেয়ার করে।",
-                color = Color(0xFF8A7A60),
+                color = Color(0xFF6C6A64),
                 fontSize = 11.sp,
                 modifier = Modifier.padding(top = 10.dp),
                 lineHeight = 16.sp
@@ -179,7 +178,7 @@ fun DbConnectModal(
             wipeResultMsg?.let { msg ->
                 Text(
                     text = msg,
-                    color = Color(0xFFE0B84A),
+                    color = Color(0xFF9A6B00),
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 10.dp)
                 )
