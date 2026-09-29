@@ -167,7 +167,7 @@ fun DetailScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F9D55))
             ) {
-                Text("💰 জমা এন্ট্রি", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("💰 জমা এন্ট্রি", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = { formKind = "bokeyoa" },
@@ -177,7 +177,7 @@ fun DetailScreen(
             ) {
                 Text(
                     if (category.isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
-                    fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Color.White
+                    fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
                 )
             }
         }

@@ -10,13 +10,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -77,7 +82,8 @@ private fun ProfitKpiCard(
     val border = if (isLoss) Color(0xFFF2A6A6) else AppColors.CardBorder
     Column(
         modifier = modifier
-            .height(110.dp)
+            .height(140.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(bg)
             .border(BorderStroke(1.dp, border), RoundedCornerShape(16.dp))
@@ -91,12 +97,26 @@ private fun ProfitKpiCard(
             color = Color(0xFF6C6A64),
             lineHeight = 16.sp
         )
+        // সংখ্যা এক লাইনে থাকবে; না আঁটলে ফন্ট ধাপে ধাপে ছোট হবে (কাটা পড়বে না)
+        var valueSize by remember(value) { mutableStateOf(15.sp) }
+        var ready by remember(value) { mutableStateOf(false) }
         Text(
             text = value,
-            fontSize = 19.sp,
+            fontSize = valueSize,
+            maxLines = 1,
+            softWrap = false,
             fontWeight = FontWeight.Bold,
             color = if (isLoss) Color(0xFFC0392B) else Color(0xFF141413),
-            modifier = Modifier.padding(top = 8.dp)
+            onTextLayout = { r ->
+                if (r.didOverflowWidth && valueSize > 9.sp) {
+                    valueSize = valueSize * 0.92f
+                } else {
+                    ready = true
+                }
+            },
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .drawWithContent { if (ready) drawContent() }
         )
     }
 }

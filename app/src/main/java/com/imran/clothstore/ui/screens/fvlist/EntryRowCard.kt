@@ -1,6 +1,5 @@
 package com.imran.clothstore.ui.screens.fvlist
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Call
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +44,6 @@ import com.imran.clothstore.util.formatTaka
  * তার নিচে বাকির পরিমাণ। সাধারণ ট্যাপে ডিটেইল খোলে, লং-প্রেসে এডিট/ডিলিট অ্যাকশন বার দেখায়।
  * (কল = ডায়ালার, WhatsApp = wa.me লিংক — বাটনের আচরণ রেফারেন্সে দেখা যায়নি, যুক্তিসঙ্গত অনুমান)
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntryRowCard(
     entry: Entry,
@@ -135,7 +132,7 @@ fun EntryRowCard(
                             android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse("https://wa.me/$wa"))
                         )
                     }) {
-                        Icon(Icons.Outlined.Chat, contentDescription = "WhatsApp", tint = AppColors.TextPrimary, modifier = Modifier.size(22.dp))
+                        Icon(WhatsAppIcon, contentDescription = "WhatsApp", tint = Color(0xFF25D366), modifier = Modifier.size(22.dp))
                     }
                 }
                 Text(

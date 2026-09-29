@@ -89,7 +89,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 MiniArtCard(
-                    title = "কাপড় ক্রয় হিসাব",
+                    title = "Purchase Report",
                     onClick = onFabricClick,
                     art = { FabricArt() },
                     labelColor = Color(0xFF1F6B4F),
@@ -103,7 +103,7 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f)
                 )
                 MiniArtCard(
-                    title = "সাপ্তাহিক রিপোর্ট",
+                    title = "Weekly Report",
                     onClick = onAggregateReportClick,
                     art = { ReportArt() },
                     labelColor = Color(0xFFB03A2E),
@@ -130,7 +130,7 @@ fun HomeScreen(
 
             item {
                 HomeCard(
-                    title = EntryCategory.REGULAR_CUSTOMER.titleBn,
+                    title = "Regular Customers",
                     statText = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER),
                     onClick = { onCardClick(EntryCategory.REGULAR_CUSTOMER) },
                     art = { CustomerArt() }
@@ -138,7 +138,7 @@ fun HomeScreen(
             }
             item {
                 HomeCard(
-                    title = EntryCategory.IRREGULAR_CUSTOMER.titleBn,
+                    title = "Irregular Customers",
                     statText = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_CUSTOMER) },
                     art = { CustomerIrregularArt() }
@@ -146,7 +146,7 @@ fun HomeScreen(
             }
             item {
                 HomeCard(
-                    title = EntryCategory.REGULAR_SUPPLIER.titleBn,
+                    title = "Regular Suppliers",
                     statText = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER),
                     onClick = { onCardClick(EntryCategory.REGULAR_SUPPLIER) },
                     art = { SupplierTruckArt() }
@@ -154,7 +154,7 @@ fun HomeScreen(
             }
             item {
                 HomeCard(
-                    title = EntryCategory.IRREGULAR_SUPPLIER.titleBn,
+                    title = "Irregular Suppliers",
                     statText = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_SUPPLIER) },
                     art = { SupplierIrregularArt() }

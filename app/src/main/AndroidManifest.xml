@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ছবি আপলোড (আইটেম #১১) — GetContent() কনট্র্যাক্ট Android 13+ এ system Photo Picker
+         ব্যবহার করে যার জন্য এই পারমিশন লাগে না, কিন্তু API 32 এবং তার নিচে কিছু ডিভাইসের
+         গ্যালারি অ্যাপে content resolver read এর জন্য এটা দরকার হতে পারে। -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:name=".ClothStoreApplication"
         android:allowBackup="true"
-        android:label="Cloth Store"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ClothStore">
+        android:theme="@style/Theme.ImranClothStore"
+        tools:targetApi="34">
+
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.ImranClothStore"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
+
 </manifest>

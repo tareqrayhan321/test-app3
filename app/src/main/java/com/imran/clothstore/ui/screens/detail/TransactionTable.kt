@@ -4,17 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imran.clothstore.util.formatTaka
@@ -27,7 +32,7 @@ import com.imran.clothstore.util.toBengaliDigits
  */
 @Composable
 fun TransactionTable(rows: List<TxnRow>) {
-    val colWidths = listOf(104.dp, 60.dp, 124.dp, 104.dp, 122.dp, 76.dp, 110.dp)
+    val colWidths = listOf(96.dp, 72.dp, 116.dp, 100.dp, 108.dp, 76.dp, 200.dp)
     val headers = listOf("তারিখ", "ম্যামো", "পাওনা/প্রাপ্য", "জমা", "মোট বাকি", "গজ", "মন্তব্য")
     val headerBg = Color(0xFF1E3A32)
     val pawnaBg = Color(0xFFF2E6E4)
@@ -35,19 +40,26 @@ fun TransactionTable(rows: List<TxnRow>) {
     val grid = Color(0xFFCFCBC0)
 
     Column(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-        Row(modifier = Modifier.background(headerBg)) {
+        Row(modifier = Modifier.background(headerBg).height(HEADER_H)) {
             headers.forEachIndexed { i, h ->
-                Text(
-                    text = h,
+                Box(
                     modifier = Modifier
                         .width(colWidths[i])
-                        .border(0.5.dp, Color(0xFF3B5A50))
-                        .padding(vertical = 14.dp, horizontal = 6.dp),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
+                        .fillMaxHeight()
+                        .border(0.5.dp, Color(0xFF3B5A50)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = h,
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
             }
         }
 
@@ -62,7 +74,7 @@ fun TransactionTable(rows: List<TxnRow>) {
 
         rows.forEach { row ->
             val bg = if (row.type == TxnType.BILL_OR_PAWNA) pawnaBg else jomaBg
-            Row(modifier = Modifier.background(bg)) {
+            Row(modifier = Modifier.background(bg).height(ROW_H)) {
                 Cell(formatDateShort(row.date), colWidths[0], grid, TextAlign.Center)
                 Cell(row.memo.ifBlank { "—" }.toBengaliDigits(), colWidths[1], grid, TextAlign.Center, bold = row.memo.isNotBlank())
                 Cell(
@@ -79,25 +91,36 @@ fun TransactionTable(rows: List<TxnRow>) {
                 )
                 Cell(formatTaka(row.runningBaki), colWidths[4], grid, TextAlign.Center, bold = true)
                 Cell(row.goj.ifBlank { "—" }.toBengaliDigits(), colWidths[5], grid, TextAlign.Center)
-                Cell(row.note.ifBlank { "" }, colWidths[6], grid, TextAlign.Center)
+                Cell(row.note.ifBlank { "" }, colWidths[6], grid, TextAlign.Start)
             }
         }
     }
 }
 
+private val HEADER_H = 40.dp
+private val ROW_H = 38.dp
+
 @Composable
 private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, align: TextAlign, bold: Boolean = false) {
-    Text(
-        text = text,
+    Box(
         modifier = Modifier
             .width(width)
-            .border(0.5.dp, grid)
-            .padding(vertical = 18.dp, horizontal = 6.dp),
-        fontSize = 15.sp,
-        fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
-        color = Color(0xFF141413),
-        textAlign = align
-    )
+            .fillMaxHeight()
+            .border(0.5.dp, grid),
+        contentAlignment = if (align == TextAlign.Start) Alignment.CenterStart else Alignment.Center
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 8.dp),
+            fontSize = 14.sp,
+            fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
+            color = Color(0xFF141413),
+            textAlign = align,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }
 
 /** "2026-09-23" জাতীয় ISO তারিখকে "২৩/০৯/২০২৬" (দিন/মাস দুই অঙ্কে, বাংলা অঙ্কে) ফরম্যাটে দেখায় —

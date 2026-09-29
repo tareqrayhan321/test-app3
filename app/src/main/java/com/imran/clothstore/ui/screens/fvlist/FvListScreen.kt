@@ -13,12 +13,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.imran.clothstore.util.formatTaka
 import com.imran.clothstore.util.toBengaliDigits
@@ -60,6 +60,7 @@ fun FvListScreen(
     val isFormOpen by viewModel.isFormOpen.collectAsState()
     val editingEntry by viewModel.editingEntry.collectAsState()
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -100,15 +101,6 @@ fun FvListScreen(
                             fontSize = 13.sp
                         )
                     }
-                }
-                Button(
-                    onClick = { viewModel.openNewEntryForm() },
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Text("নতুন এন্ট্রি", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 6.dp))
                 }
             }
 
@@ -167,6 +159,22 @@ fun FvListScreen(
                 }
             }
         }
+    }
+
+    // ── নতুন এন্ট্রি (নিচে ডান কোণে ছোট FAB) ──
+    FloatingActionButton(
+        onClick = { viewModel.openNewEntryForm() },
+        shape = CircleShape,
+        containerColor = AppColors.HeaderTeal,
+        contentColor = Color.White,
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .navigationBarsPadding()
+            .padding(end = 28.dp, bottom = 36.dp)
+            .size(56.dp)
+    ) {
+        Icon(person_add, contentDescription = "নতুন এন্ট্রি", modifier = Modifier.size(24.dp))
+    }
     }
 
     // ── এন্ট্রি ফর্ম ডায়ালগ ──
