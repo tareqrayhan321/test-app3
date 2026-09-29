@@ -96,11 +96,12 @@ fun MiniArtCard(
     art: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     labelColor: Color = AppColors.TextPrimary,
-    subtitle: String? = null
+    subtitle: String? = null,
+    cardHeight: androidx.compose.ui.unit.Dp = 140.dp
 ) {
     Box(
         modifier = modifier
-            .height(140.dp)
+            .height(cardHeight)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
@@ -127,8 +128,8 @@ fun MiniArtCard(
                 Text(
                     text = subtitle,
                     fontSize = 9.sp,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    maxLines = 2,
+                    lineHeight = 12.sp,
                     color = Color(0xFF3D3B36),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 3.dp)
