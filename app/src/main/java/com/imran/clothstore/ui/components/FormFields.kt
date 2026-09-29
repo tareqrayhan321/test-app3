@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.matchParentSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,8 +41,8 @@ private val FieldBg = Color(0xFFFAF9F5)
 private val FieldBorder = Color(0xFFCFC5AC)
 
 /**
- * পপআপ/ফর্মের সাধারণ ইনপুট বক্স। লেবেল খালি অবস্থায় বক্সের ভেতরে থাকে, টাইপ শুরু করলে
- * (বা ফোকাস পেলে) বর্ডারের উপরে উঠে যায়। উচ্চতা ফিক্স করা নেই, তাই লেখা কাটে না।
+ * পপআপ/ফর্মের সাধারণ ইনপুট বক্স। লেবেল খালি অবস্থায় বক্সের ভেতরে থাকে, টা
+ * (বা ফোকাস পেলে) বর্ডারের উপরে উঠে যায়। উচ্চতা ফিক্স করা নেই, তাই লেখা কাটে
  */
 @Composable
 fun AppTextField(
@@ -80,8 +80,8 @@ fun AppTextField(
 }
 
 /**
- * তারিখের ইনপুট — লেখার সুযোগ নেই; ট্যাপ করলে ক্যালেন্ডার খোলে। মান ISO ("yyyy-MM-dd") ফরম্যাটে
- * সংরক্ষিত হয় (অ্যাপের বাকি অংশ এই ফরম্যাটই পড়ে), স্ক্রিনে "দিন/মাস/বছর" বাংলা অঙ্কে দেখায়।
+ * তারিখের ইনপুট — লেখার সুযোগ নেই; ট্যাপ করলে ক্যালেন্ডার খোলে। মান ISO ("yyyy-MM-dd") 
+ * সংরক্ষিত হয় (অ্যাপের বাকি অংশ এই ফরম্যাটই পড়ে), স্ক্রিনে "দিন/মাস/বছর" বা
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,10 +109,10 @@ fun AppDateField(
                 )
             }
         )
-        // টেক্সট ফিল্ডের উপরের স্বচ্ছ স্তর — পুরো বক্সে ট্যাপ ধরে ক্যালেন্ডার খোলে
+        // টেক্সট ফিল্ডের উপরের স্বচ্ছ স্তর — পুরো বক্সে ট্যাপ ধরে ক্যালেন্ডার 
         Box(
             modifier = Modifier
-                .matchParentSize()
+                .fillMaxSize()
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
