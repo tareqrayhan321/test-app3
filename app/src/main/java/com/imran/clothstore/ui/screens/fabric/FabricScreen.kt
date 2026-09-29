@@ -85,6 +85,7 @@ fun FabricScreen(
 
             if (groups.isNotEmpty()) {
                 OutlinedTextField(
+                    shape = androidx.compose.foundation.shape.CircleShape,
                     value = query,
                     onValueChange = viewModel::onSearchChange,
                     placeholder = { Text("কাপড়ের নাম খুঁজুন...") },

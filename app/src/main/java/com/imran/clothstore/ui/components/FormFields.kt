@@ -42,7 +42,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-private val FieldBg = Color(0xFFFAF9F5)
+private val FieldBg = Color.White
 private val FieldBorder = Color(0xFFCFC5AC)
 
 /**
@@ -71,7 +71,7 @@ fun AppTextField(
             color = FieldBg,
             topLeft = Offset(0f, top),
             size = Size(size.width, size.height - top),
-            cornerRadius = CornerRadius(12.dp.toPx())
+            cornerRadius = CornerRadius((size.height - top) / 2f)
         )
     }
     OutlinedTextField(
@@ -85,7 +85,7 @@ fun AppTextField(
         trailingIcon = trailingIcon,
         textStyle = TextStyle(fontSize = 15.sp, color = AppColors.TextPrimary),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(12.dp),
+        shape = androidx.compose.foundation.shape.CircleShape,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,

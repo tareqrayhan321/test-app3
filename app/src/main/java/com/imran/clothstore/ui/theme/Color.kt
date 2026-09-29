@@ -26,7 +26,7 @@ object AppColors {
     // ── ওয়েব অ্যাপের হোম কার্ড থিম — ক্রিম/বেইজ ব্যাকগ্রাউন্ড + সোনালি বর্ডার ──
     // (রেফারেন্স স্ক্রিনশট অনুযায়ী: home-card, kpi card, calendar strip card সবকটার
     // ব্যাকগ্রাউন্ড এই ক্রিম টোন এবং প্রতিটার একটা পাতলা সোনালি বর্ডার আছে)
-    val CardCream = Color(0xFFF3ECD9)
+    val CardCream = Color.White
     val CardBorder = Color(0xFFD9C48A)
 
     // ── উড প্যানেল বেজ গ্রেডিয়েন্টের স্টপ কালার (--wood-base) ──

@@ -202,6 +202,7 @@ fun DbConnectModal(
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 OutlinedTextField(
+                    shape = androidx.compose.foundation.shape.CircleShape,
                     value = secretInput,
                     onValueChange = {
                         secretInput = it

@@ -48,6 +48,7 @@ fun PkInputRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             OutlinedTextField(
+                shape = androidx.compose.foundation.shape.CircleShape,
                 value = value,
                 onValueChange = { new -> if (new.all { it.isDigit() || it == '.' }) onValueChange(new) },
                 placeholder = { Text("0") },

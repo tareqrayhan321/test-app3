@@ -27,7 +27,7 @@ import com.imran.clothstore.util.toArabicDigits
 import com.imran.clothstore.util.toBengaliDigits
 import java.util.Calendar
 
-private val CalCanvas = Color(0xFFFAF9F5)
+private val CalCanvas = Color.White
 private val CalHairline = Color(0xFFE6DFD8)
 private val CalMuted = Color(0xFF6C6A64)
 private val CalMutedSoft = Color(0xFF8E8B82)

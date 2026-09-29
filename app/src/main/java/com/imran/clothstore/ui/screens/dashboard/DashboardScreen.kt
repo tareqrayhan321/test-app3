@@ -109,7 +109,7 @@ fun DashboardScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFFAF9F5))
+                    .background(Color.White)
                     .border(BorderStroke(1.dp, Color(0xFFE2D9C4)), RoundedCornerShape(16.dp))
                     .clickable(onClick = onAggregateReportClick)
                     .padding(14.dp)

@@ -48,7 +48,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFFAF9F5))
+            .background(Color.White)
             .border(androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2D9C4)), RoundedCornerShape(16.dp))
             .padding(14.dp)
     ) {
@@ -142,7 +142,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
                 title = "তারল্য ঝুঁকি — Credit Sales > 60%",
                 desc = "মোট বিক্রয়ের ৬০%-এর বেশি বাকিতে। নগদ প্রবাহে সমস্যার ঝুঁকি আছে।",
                 action = "১. পুরনো বাকি আদায় ত্বরান্বিত করুন ২. Cash Discount বিবেচনা করুন",
-                bg = Color(0xFFFBF6E6)
+                bg = Color.White
             )
         }
         if (latest.net > 0 && netCashFlow < 0) {

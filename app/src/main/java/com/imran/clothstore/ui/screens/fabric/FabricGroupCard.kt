@@ -76,7 +76,7 @@ fun FabricGroupCard(
                     modifier = Modifier
                         .padding(start = 6.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFF0EEE5))
+                        .background(Color.White)
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
             }
@@ -89,7 +89,7 @@ fun FabricGroupCard(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFF7EFD8))
+                            .background(Color.White)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -111,7 +111,7 @@ fun FabricGroupCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFFDF6F0))
+                    .background(Color.White)
                     .padding(12.dp)
             ) {
                 errorMsg?.let {
@@ -119,6 +119,7 @@ fun FabricGroupCard(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
+                        shape = androidx.compose.foundation.shape.CircleShape,
                         value = dcaQty,
                         onValueChange = { dcaQty = it },
                         label = { Text("পরিমাণ (${group.unit})") },
@@ -127,6 +128,7 @@ fun FabricGroupCard(
                         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
                     )
                     OutlinedTextField(
+                        shape = androidx.compose.foundation.shape.CircleShape,
                         value = dcaRate,
                         onValueChange = { dcaRate = it },
                         label = { Text("দর/${group.unit}") },
@@ -166,7 +168,7 @@ fun FabricGroupCard(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(if (idx % 2 == 1) Color(0xFFFAFAF8) else Color.Transparent)
+                        .background(if (idx % 2 == 1) Color.White else Color.Transparent)
                         .padding(horizontal = 14.dp, vertical = 9.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

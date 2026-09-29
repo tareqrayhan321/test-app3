@@ -64,15 +64,19 @@ fun FvListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppColors.HeaderTeal)
     ) {
-        // ── হেডার (ক্রিম, রেফারেন্স অনুযায়ী) ──
+        // ── হেডার (মেইন হেডারের মতো টিল গ্রেডিয়েন্ট) ──
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF5F1E8))
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    )
+                )
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 22.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -83,13 +87,13 @@ fun FvListScreen(
                     Icon(
                         imageVector = Icons.Outlined.Groups,
                         contentDescription = null,
-                        tint = Color(0xFF4A4740),
+                        tint = Color.White,
                         modifier = Modifier.size(30.dp)
                     )
                     Column(modifier = Modifier.padding(start = 14.dp)) {
                         Text(
                             text = category.titleBn,
-                            color = AppColors.TextPrimary,
+                            color = Color.White,
                             fontSize = 21.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -97,7 +101,7 @@ fun FvListScreen(
                             text = if (totalCount > 0)
                                 "${totalCount.toBengaliDigits()} জন · মোট বাকি ${formatTaka(totalBaki)}"
                             else "কোনো এন্ট্রি নেই",
-                            color = Color(0xFF4A4740),
+                            color = Color.White.copy(alpha = 0.75f),
                             fontSize = 13.sp
                         )
                     }
@@ -110,7 +114,7 @@ fun FvListScreen(
                 placeholder = { Text("নাম বা ঠিকানা খুঁজুন...", color = Color(0xFF8E8B82)) },
                 leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color(0xFF6C6A64)) },
                 singleLine = true,
-                shape = RoundedCornerShape(14.dp),
+                shape = CircleShape,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -123,39 +127,47 @@ fun FvListScreen(
             )
         }
 
-        // ── লিস্ট বডি ──
-        if (entries.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (query.isNotBlank()) "কোনো ফলাফল নেই" else "কোনো এন্ট্রি নেই",
-                    fontSize = 14.sp,
-                    color = Color(0xFF9A96AD)
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(entries, key = { it.id }) { entry ->
-                    EntryRowCard(
-                        entry = entry,
-                        isSelected = selectedForAction?.id == entry.id,
-                        onClick = {
-                            if (selectedForAction != null) {
-                                viewModel.selectForAction(null)
-                            } else {
-                                onEntryClick(entry)
-                            }
-                        },
-                        onLongPress = { viewModel.selectForAction(entry) },
-                        onEdit = { viewModel.openEditForm(entry) },
-                        onDelete = { viewModel.deleteEntry(entry) }
+        // ── লিস্ট বডি (উপরে গোলাকার কোণ) ──
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color.White)
+        ) {
+            if (entries.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (query.isNotBlank()) "কোনো ফলাফল নেই" else "কোনো এন্ট্রি নেই",
+                        fontSize = 14.sp,
+                        color = Color(0xFF9A96AD)
                     )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(entries, key = { it.id }) { entry ->
+                        EntryRowCard(
+                            entry = entry,
+                            isSelected = selectedForAction?.id == entry.id,
+                            onClick = {
+                                if (selectedForAction != null) {
+                                    viewModel.selectForAction(null)
+                                } else {
+                                    onEntryClick(entry)
+                                }
+                            },
+                            onLongPress = { viewModel.selectForAction(entry) },
+                            onEdit = { viewModel.openEditForm(entry) },
+                            onDelete = { viewModel.deleteEntry(entry) }
+                        )
+                    }
                 }
             }
         }
