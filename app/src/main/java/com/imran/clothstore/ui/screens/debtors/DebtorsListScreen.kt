@@ -10,8 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,17 +56,23 @@ fun DebtorsListScreen(
 
     var jomaDialogRow by remember { mutableStateOf<DebtorRow?>(null) }
 
+    // কাপড় ক্রয় স্ক্রিনের কাঠামো: টিল পটভূমি → গ্রেডিয়েন্ট হেডার (স্ট্যাটাস বারের নিচে) → গোলাকার-মাথা বডি
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppColors.HeaderTeal)
     ) {
         // ── হেডার ──
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(AppColors.HeaderTeal)
-                .padding(16.dp)
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    )
+                )
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp)
         ) {
             Column {
                 Text(
@@ -124,9 +131,17 @@ fun DebtorsListScreen(
             )
         }
 
+        // ── বডি (উপরে গোলাকার কোণ) ──
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color.White)
+        ) {
         // ── বডি: টেবিল ──
         if (rows.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text("কোনো এন্ট্রি পাওয়া যায়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
             }
         } else {
@@ -154,7 +169,8 @@ fun DebtorsListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .padding(vertical = 12.dp),
+                    .navigationBarsPadding()
+                    .padding(top = 12.dp, bottom = 20.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -166,6 +182,7 @@ fun DebtorsListScreen(
                     Text("৳${totalBokea.toLong()}", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
+        }
         }
     }
 
