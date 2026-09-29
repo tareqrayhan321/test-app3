@@ -50,14 +50,17 @@ class HomeViewModel(
     }
 
     /** একটা নির্দিষ্ট ক্যাটাগরির সামারি টেক্সট, অথবা PARTY হলে চারটার সম্মিলিত সামারি */
-    fun formatSummary(category: EntryCategory): String {
+    fun formatSummary(category: EntryCategory): String = formatSummary(category, _summaries.value)
+
+    /** Compose থেকে State-এর মান পাস করে ডাকার জন্য — যাতে সামারি বদলালে কার্ড recompose হয় */
+    fun formatSummary(category: EntryCategory, summaries: Map<EntryCategory, CategorySummary>): String {
         if (category == EntryCategory.PARTY) {
-            val all = _summaries.value.values
+            val all = summaries.values
             val totalCount = all.sumOf { it.totalCount }
             val totalAmount = all.sumOf { it.totalAmount }
             return "মোট ${totalCount.toBengaliDigits()} জন · ${formatTaka(totalAmount)}"
         }
-        val summary = _summaries.value[category] ?: return "মোট ০ জন · ৳০"
+        val summary = summaries[category] ?: return "মোট ০ জন · ৳০"
         return "মোট ${summary.totalCount.toBengaliDigits()} জন · ${formatTaka(summary.totalAmount)}"
     }
 }
