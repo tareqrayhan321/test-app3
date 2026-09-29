@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.imran.clothstore.ui.components.AppDateField
+import com.imran.clothstore.ui.components.AppTextField
 import com.imran.clothstore.ui.theme.AppColors
 import coil.compose.AsyncImage
 import com.imran.clothstore.data.model.Entry
@@ -170,8 +172,8 @@ fun EntryFormDialog(
 
                 // ── নাম | ঠিকানা ──
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    EfField(name, { name = it }, if (isCustomerType) "নাম" else "নাম *", Modifier.weight(1f))
-                    EfField(addr, { addr = it }, "ঠিকানা", Modifier.weight(1f))
+                    AppTextField(name, { name = it }, if (isCustomerType) "নাম" else "নাম *", Modifier.weight(1f))
+                    AppTextField(addr, { addr = it }, "ঠিকানা", Modifier.weight(1f))
                 }
 
                 // ── +৮৮ মোবাইল | তারিখ ──
@@ -180,46 +182,31 @@ fun EntryFormDialog(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(EfFieldHeight)
-                            .background(EfFieldBg, RoundedCornerShape(EfRadius))
-                            .border(BorderStroke(1.dp, EfBorder), RoundedCornerShape(EfRadius)),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "+88",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(start = 12.dp, end = 10.dp)
-                        )
-                        EfField(
-                            value = mob,
-                            onChange = { mob = it },
-                            placeholder = "",
-                            modifier = Modifier.weight(1f),
-                            keyboardType = KeyboardType.Phone,
-                            boxed = false
-                        )
-                    }
-                    EfField(date, { date = it }, "তারিখ", Modifier.weight(1f))
+                    AppTextField(
+                        value = mob,
+                        onValueChange = { mob = it },
+                        label = "মোবাইল",
+                        modifier = Modifier.weight(1f),
+                        keyboardType = KeyboardType.Phone,
+                        leadingIcon = { Text("+88", fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+                    )
+                    AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
                 }
 
                 // ── ম্যামো নং | পাওনা/বকেয়া ──
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    EfField(memo, { memo = it }, "ম্যামো নং", Modifier.weight(1f), KeyboardType.Number)
-                    EfField(billOrBaki, { billOrBaki = it }, billLabel, Modifier.weight(1f), KeyboardType.Decimal)
+                    AppTextField(memo, { memo = it }, "ম্যামো নং", Modifier.weight(1f), KeyboardType.Number)
+                    AppTextField(billOrBaki, { billOrBaki = it }, billLabel, Modifier.weight(1f), KeyboardType.Decimal)
                 }
 
                 // ── জমা | গজ ──
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    EfField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
-                    EfField(goj, { goj = it }, "গজ", Modifier.weight(1f))
+                    AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
+                    AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f))
                 }
 
                 // ── মন্তব্য (পুরো প্রস্থ) ──
-                EfField(note, { note = it }, "মন্তব্য", Modifier.padding(top = 14.dp).fillMaxWidth())
+                AppTextField(note, { note = it }, "মন্তব্য", Modifier.padding(top = 14.dp).fillMaxWidth())
 
                 // ── নিচের সারি: ✕ (বৃত্ত) + ✓ সেভ করুন ──
                 Row(
@@ -268,38 +255,3 @@ private val EfBorder = Color(0xFFE2D9C4)
 private val EfCloseBg = Color(0xFFF5EFE2)
 private val EfRadius = 12.dp
 private val EfFieldHeight = 48.dp
-
-/** প্লেসহোল্ডার-স্টাইল ইনপুট বক্স (ফ্লোটিং লেবেল নেই) — রেফারেন্সের মতো। */
-@Composable
-private fun EfField(
-    value: String,
-    onChange: (String) -> Unit,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    boxed: Boolean = true
-) {
-    val base = if (boxed) {
-        modifier
-            .height(EfFieldHeight)
-            .background(EfFieldBg, RoundedCornerShape(EfRadius))
-            .border(BorderStroke(1.dp, EfBorder), RoundedCornerShape(EfRadius))
-    } else modifier.height(EfFieldHeight)
-
-    TextField(
-        value = value,
-        onValueChange = onChange,
-        placeholder = { if (placeholder.isNotEmpty()) Text(placeholder, fontSize = 15.sp, color = AppColors.TextPrimary) },
-        singleLine = true,
-        textStyle = TextStyle(fontSize = 15.sp, color = AppColors.TextPrimary),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        modifier = base,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        )
-    )
-}
