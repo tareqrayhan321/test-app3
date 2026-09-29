@@ -63,6 +63,10 @@ class SyncWorker(
                 Log.w(TAG, "Could not read the remote backup; retrying", e)
                 return Result.retry()
             }
+            Log.i(
+                TAG,
+                "Remote backup loaded: parties=${remotePayload.is_c1_list.size + remotePayload.is_c2_list.size + remotePayload.is_c3_list.size + remotePayload.is_c4_list.size}, weekly=${remotePayload.chart_data.size}, fabric=${remotePayload.fabricPurchaseData_v2.size}"
+            )
 
             val merged: BackupPayload = if (hasPending) {
                 SyncEngine.merge(local = localPayload, remote = remotePayload)
@@ -83,6 +87,7 @@ class SyncWorker(
             }
             // pull-এর ফলাফল (অন্য ডিভাইসের পরিবর্তনসহ) Room-এ প্রতিফলিত করা, pendingSync ক্লিয়ার করা
             local.save(merged, markPendingSync = false)
+            Log.i(TAG, "Room backup cache refreshed successfully")
 
             Result.success()
         } catch (e: Exception) {

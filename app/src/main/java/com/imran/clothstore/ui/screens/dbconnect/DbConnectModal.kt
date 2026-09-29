@@ -148,7 +148,7 @@ fun DbConnectModal(
                 onClick = { viewModel.checkConnection() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("সংযোগ পুনরায় যাচাই করুন", fontSize = 13.sp)
+                Text("Firestore যাচাই ও সিঙ্ক করুন", fontSize = 13.sp)
             }
 
             Button(

@@ -2,7 +2,9 @@ package com.imran.clothstore.ui.screens.dbconnect
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.imran.clothstore.AppSingletons
 import com.imran.clothstore.data.backup.BackupRepository
+import com.imran.clothstore.data.sync.SyncWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,9 +39,13 @@ class DbConnectViewModel(
         _connectionState.value = DbConnectionState.CONNECTING
         viewModelScope.launch {
             try {
-                repository.fetchOnce()
+                // Room cache খালি থাকলেও যেন "সংযুক্ত" বলে ভুল না দেখায়—সরাসরি cloud read করি।
+                val remote = repository.fetchRemoteOnce()
+                AppSingletons.appContext?.let { context -> SyncWorker.triggerImmediate(context) }
+                val partyCount = remote.is_c1_list.size + remote.is_c2_list.size +
+                    remote.is_c3_list.size + remote.is_c4_list.size
                 _connectionState.value = DbConnectionState.CONNECTED
-                _lastSyncText.value = "সর্বশেষ সিঙ্ক: এইমাত্র"
+                _lastSyncText.value = "ক্লাউডে পার্টি: $partyCount · সাপ্তাহিক রিপোর্ট: ${remote.chart_data.size}; সিঙ্ক অনুরোধ করা হয়েছে"
             } catch (e: Exception) {
                 _connectionState.value = DbConnectionState.ERROR
                 _lastSyncText.value = "সংযোগ ব্যর্থ: ${e.message}"
