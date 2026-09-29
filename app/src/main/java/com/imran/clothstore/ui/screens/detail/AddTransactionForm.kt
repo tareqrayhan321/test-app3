@@ -99,7 +99,7 @@ private fun ColumnScope.BokeyoaMiniForm(
             .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
-        // ফিল্ডগুল�� স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়
+        // ফিল্ডগুলো স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়
         Column(
             modifier = Modifier
                 .weight(1f, fill = false)

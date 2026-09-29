@@ -53,7 +53,7 @@ fun DetailScreen(
     val entry by viewModel.entry.collectAsState()
     val rows by viewModel.transactionRows.collectAsState()
 
-    var formKind by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) } // "bokeyoa" | "joma" | null
+    var formKind by remember { mutableStateOf<String?>(null) } // "bokeyoa" | "joma" | null
 
     Column(
         modifier = Modifier
@@ -113,7 +113,7 @@ fun DetailScreen(
                 }
             }
         }
-        Box(
+        androidx.compose.foundation.layout.Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
@@ -129,7 +129,7 @@ fun DetailScreen(
             TransactionTable(rows = rows)
         }
 
-        // ── স্��িকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
+        // ── স্টিকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
