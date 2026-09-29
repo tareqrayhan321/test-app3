@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,17 +58,23 @@ fun AggregateReportOverlay(
     val sumIn = reports.sumOf { it.cashIn }
     val sumOut = reports.sumOf { it.cashOut }
 
+    // নোটিফিকেশন স্ক্রিনের কাঠামো: টিল পটভূমি → গ্রেডিয়েন্ট হেডার (স্ট্যাটাস বারের নিচে) → গোলাকার-মাথা বডি
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(AppColors.HeaderTeal)
     ) {
         // ── হেডার ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(AppColors.HeaderTeal)
-                .padding(16.dp),
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    )
+                )
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -83,6 +91,14 @@ fun AggregateReportOverlay(
             }
         }
 
+        // ── বডি (উপরে গোলাকার কোণ) ──
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color(0xFFFAF9F5))
+        ) {
         if (reports.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("এখনো কোনো সাপ্তাহিক হিসাব যোগ করা হয়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
@@ -153,6 +169,7 @@ fun AggregateReportOverlay(
                     modifier = Modifier.combinedClickable(onClick = { deleteMode = false })
                 )
             }
+        }
         }
     }
 }

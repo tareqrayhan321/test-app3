@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,17 +51,23 @@ fun FabricScreen(
     val summaryText by viewModel.cardSummaryText.collectAsState()
     var showNewForm by remember { mutableStateOf(false) }
 
+    // নোটিফিকেশন স্ক্রিনের কাঠামো: টিল পটভূমি → গ্রেডিয়েন্ট হেডার (স্ট্যাটাস বারের নিচে) → গোলাকার-মাথা বডি
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAF9F5))
+            .background(AppColors.HeaderTeal)
     ) {
         // ── হেডার ──
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(AppColors.HeaderTeal)
-                .padding(16.dp)
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    )
+                )
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -92,6 +100,14 @@ fun FabricScreen(
             }
         }
 
+        // ── বডি (উপরে গোলাকার কোণ) ──
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color(0xFFFAF9F5))
+        ) {
         if (showNewForm) {
             Box(modifier = Modifier.padding(14.dp)) {
                 FabricNewPurchaseForm(
@@ -105,7 +121,7 @@ fun FabricScreen(
 
         // ── বডি ──
         if (groups.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         "এখনো কোনো কাপড় ক্রয় যোগ করা হয়নি",
@@ -117,7 +133,7 @@ fun FabricScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)
             ) {
                 items(groups, key = { it.id }) { group ->
@@ -132,6 +148,7 @@ fun FabricScreen(
                     )
                 }
             }
+        }
         }
     }
 }
