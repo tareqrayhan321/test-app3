@@ -85,7 +85,7 @@ fun PkStep1Fixed(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
+                .background(Color.White, RoundedCornerShape(10.dp))
                 .padding(12.dp)
         ) {
             Text("সাপ্তাহিক স্থায়ী খরচ (স্বয়ংক্রিয়)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6C6A64))

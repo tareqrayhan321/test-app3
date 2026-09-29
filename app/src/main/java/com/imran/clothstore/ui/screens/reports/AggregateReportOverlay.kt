@@ -116,7 +116,7 @@ fun AggregateReportOverlay(
             val colWidths = listOf(90.dp, 70.dp, 70.dp, 76.dp, 76.dp, 70.dp, 70.dp)
             val headers = listOf("সপ্তাহ", "ইন-স্টক", "আউট-স্টক", "নেট", "গ্রস", "ক্যাশ-ইন", "ক্যাশ-আউট")
 
-            Row(modifier = Modifier.background(Color(0xFFF0EEE5))) {
+            Row(modifier = Modifier.background(Color.White)) {
                 headers.forEachIndexed { i, h ->
                     Text(
                         text = h,
@@ -140,7 +140,7 @@ fun AggregateReportOverlay(
             }
 
             // ── ফুটার টোটাল ──
-            Row(modifier = Modifier.background(Color(0xFFF0EEE5))) {
+            Row(modifier = Modifier.background(Color.White)) {
                 Text("সর্বমোট", modifier = Modifier.width(colWidths[0]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
                 Text(formatGaj(sumInStock), modifier = Modifier.width(colWidths[1]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
                 Text(formatGaj(sumOutStock), modifier = Modifier.width(colWidths[2]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)

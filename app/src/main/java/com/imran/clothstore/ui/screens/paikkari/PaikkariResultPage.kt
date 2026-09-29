@@ -129,7 +129,7 @@ fun PaikkariResultPage(
 private fun StatBox(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
+            .background(Color.White, RoundedCornerShape(10.dp))
             .padding(vertical = 10.dp, horizontal = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

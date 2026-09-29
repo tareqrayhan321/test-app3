@@ -109,6 +109,7 @@ fun DebtorsListScreen(
             }
 
             OutlinedTextField(
+                shape = androidx.compose.foundation.shape.CircleShape,
                 value = query,
                 onValueChange = viewModel::onSearchChange,
                 placeholder = { Text("নাম বা ঠিকানা খুঁজুন…") },
@@ -135,7 +136,7 @@ fun DebtorsListScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFFF0EEE5))
+                            .background(Color.White)
                             .padding(vertical = 8.dp, horizontal = 4.dp)
                     ) {
                         Text("পার্টির নাম", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(90.dp))
@@ -152,7 +153,7 @@ fun DebtorsListScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF0EEE5))
+                    .background(Color.White)
                     .padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {

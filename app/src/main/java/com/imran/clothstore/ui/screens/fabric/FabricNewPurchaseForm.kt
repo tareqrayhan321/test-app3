@@ -46,7 +46,7 @@ fun FabricNewPurchaseForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFFDF6F0), RoundedCornerShape(12.dp))
+            .background(Color.White, RoundedCornerShape(12.dp))
             .padding(14.dp)
     ) {
         errorMsg?.let {
@@ -54,6 +54,7 @@ fun FabricNewPurchaseForm(
         }
 
         OutlinedTextField(
+            shape = androidx.compose.foundation.shape.CircleShape,
             value = name,
             onValueChange = { name = it },
             label = { Text("কাপড়ের নাম") },
@@ -68,6 +69,7 @@ fun FabricNewPurchaseForm(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedTextField(
+                shape = androidx.compose.foundation.shape.CircleShape,
                 value = qty,
                 onValueChange = { qty = it },
                 label = { Text("পরিমাণ") },
@@ -76,6 +78,7 @@ fun FabricNewPurchaseForm(
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
             OutlinedTextField(
+                shape = androidx.compose.foundation.shape.CircleShape,
                 value = unit,
                 onValueChange = { unit = it },
                 label = { Text("একক") },
@@ -85,6 +88,7 @@ fun FabricNewPurchaseForm(
         }
 
         OutlinedTextField(
+            shape = androidx.compose.foundation.shape.CircleShape,
             value = rate,
             onValueChange = { rate = it },
             label = { Text("একক দর (৳)") },

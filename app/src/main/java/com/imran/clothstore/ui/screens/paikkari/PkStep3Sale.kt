@@ -64,7 +64,7 @@ fun PkStep3Sale(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
+                .background(Color.White, RoundedCornerShape(10.dp))
                 .padding(12.dp)
         ) {
             PkAutoRow("মোট বিক্রি", formatTaka(totalSale))

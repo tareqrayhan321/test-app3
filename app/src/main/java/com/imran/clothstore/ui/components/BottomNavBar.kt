@@ -47,7 +47,7 @@ fun BottomNavBar(
             .padding(horizontal = 96.dp, vertical = 12.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(28.dp))
-            .background(Color(0xFFF4F1EA).copy(alpha = 0.96f))
+            .background(Color.White.copy(alpha = 0.96f))
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {

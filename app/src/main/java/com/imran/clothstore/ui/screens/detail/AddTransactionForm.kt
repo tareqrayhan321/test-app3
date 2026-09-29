@@ -51,7 +51,7 @@ fun TransactionFormSheet(
     androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = Color(0xFFF0E9DA)
+        containerColor = Color.White
     ) {
         Column(
             modifier = Modifier
@@ -96,7 +96,7 @@ private fun ColumnScope.BokeyoaMiniForm(
             .fillMaxWidth()
             .weight(1f, fill = false)
             .padding(top = 10.dp)
-            .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
+            .background(Color.White, RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
         // ফিল্ডগুলো স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়
@@ -142,7 +142,7 @@ private fun ColumnScope.JomaMiniForm(
             .fillMaxWidth()
             .weight(1f, fill = false)
             .padding(top = 10.dp)
-            .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
+            .background(Color.White, RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
         // ফিল্ডগুলো স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়

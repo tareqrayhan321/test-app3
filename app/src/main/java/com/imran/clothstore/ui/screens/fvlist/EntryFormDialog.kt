@@ -252,10 +252,10 @@ fun EntryFormDialog(
 }
 
 // ── ফর্মের রঙ/মাপ — রেফারেন্স স্ক্রিনশট (ক্রিম প্যানেল + অফ-হোয়াইট ইনপুট) থেকে ──
-private val EfCream = Color(0xFFF0E9DA)
+private val EfCream = Color.White
 private val EfCircle = Color(0xFFE6DDC8)
-private val EfFieldBg = Color(0xFFFAF9F5)
+private val EfFieldBg = Color.White
 private val EfBorder = Color(0xFFE2D9C4)
-private val EfCloseBg = Color(0xFFF5EFE2)
+private val EfCloseBg = Color.White
 private val EfRadius = 12.dp
 private val EfFieldHeight = 48.dp

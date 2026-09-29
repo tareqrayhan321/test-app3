@@ -100,7 +100,7 @@ fun PaikkariCalculatorScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFF0EEE5))
+                            .background(Color.White)
                     ) {
                         Icon(Icons.Filled.Close, contentDescription = "বন্ধ করুন", tint = Color(0xFF6C6A64))
                     }

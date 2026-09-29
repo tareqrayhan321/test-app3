@@ -64,7 +64,7 @@ fun DetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF5F1E8))
+                .background(Color.White)
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -133,7 +133,7 @@ fun DetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF0EDE6))
+                .background(Color.White)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -155,7 +155,7 @@ fun DetailScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF0EDE6))
+                .background(Color.White)
                 .navigationBarsPadding()
                 .padding(horizontal = 12.dp)
                 .padding(bottom = 8.dp),

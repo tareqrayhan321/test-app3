@@ -60,7 +60,7 @@ fun EntryRowCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFFF0E9DA))
+            .background(Color.White)
             .border(BorderStroke(1.dp, Color(0xFFE2D9C4)), RoundedCornerShape(20.dp))
             .combinedClickable(onClick = onClick, onLongClick = onLongPress)
             .padding(horizontal = 14.dp, vertical = 14.dp)
