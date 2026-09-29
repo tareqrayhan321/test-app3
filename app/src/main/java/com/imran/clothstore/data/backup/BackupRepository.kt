@@ -6,6 +6,8 @@ import com.imran.clothstore.AppSingletons
 import com.imran.clothstore.data.local.LocalCacheRepository
 import com.imran.clothstore.data.sync.SyncWorker
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -34,6 +36,10 @@ class BackupRepository(
         const val COLLECTION = "imran_store"
         const val DOCUMENT = "backup"
         const val MAX_CHART_ENTRIES = 26
+
+        /** সব write সিরিয়ালি চলে — BackupRepository() বহু জায়গায় আলাদা করে তৈরি হয়, তাই companion-এ রাখা।
+         *  নাহলে দুটো একসাথে read-modify-write করলে একটার আপডেট হারিয়ে যেত। */
+        private val writeMutex = Mutex()
     }
 
     private val docRef get() = db.collection(COLLECTION).document(DOCUMENT)
@@ -75,10 +81,12 @@ class BackupRepository(
      * "filtered = data[k].filter(r => !deletedForKey.has(r.id))" চেকের সমতুল্য।
      */
     private suspend fun updatePayload(transform: (BackupPayload) -> BackupPayload) {
-        val current = local.getOnce()
-        val tombstoneFiltered = applyTombstones(current)
-        val updated = transform(tombstoneFiltered).copy(updatedAt = System.currentTimeMillis())
-        local.save(applyTombstones(updated), markPendingSync = true)
+        writeMutex.withLock {
+            val current = local.getOnce()
+            val tombstoneFiltered = applyTombstones(current)
+            val updated = transform(tombstoneFiltered).copy(updatedAt = System.currentTimeMillis())
+            local.save(applyTombstones(updated), markPendingSync = true)
+        }
         appContext?.let { SyncWorker.triggerImmediate(it) }
     }
 
@@ -249,7 +257,9 @@ class BackupRepository(
     /** এখন Room-এও সাথে সাথে খালি করে দেয় (pendingSync=true) — SyncWorker ব্যাকগ্রাউন্ডে
      *  Firestore-এও একই wipe push করবে, ঠিক অন্য যেকোনো পরিবর্তনের মতো। */
     suspend fun wipeAll() {
-        local.save(BackupPayload(updatedAt = System.currentTimeMillis()), markPendingSync = true)
+        writeMutex.withLock {
+            local.save(BackupPayload(updatedAt = System.currentTimeMillis()), markPendingSync = true)
+        }
         appContext?.let { SyncWorker.triggerImmediate(it) }
     }
 }
