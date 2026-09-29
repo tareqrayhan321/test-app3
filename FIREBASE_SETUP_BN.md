@@ -23,17 +23,13 @@ PY
 
 > **অ্যাপ পরিচয়ের পরিবর্তন:** আগের build যদি `com.imran.clothstore` application ID-তে install করা হয়ে থাকে, নতুন `com.clothingstore.myandroidapp` build সেটির update নয়—Android-এ আলাদা app হিসেবে install হবে। পুরোনো app-এর Room-এ থাকা local data লাগলে আগে backup/migration করে নিন। Source namespace `com.imran.clothstore` অপরিবর্তিত; namespace ও application ID আলাদা হতে পারে।
 
-## Firebase Console-এ করণীয়
+## Firebase Console setup সম্পন্ন
 
-1. [Firebase Console](https://console.firebase.google.com/)-এ বিদ্যমান `dokane-aa207` project খুলুন।
-2. **Project settings → General → Your apps**-এ package name `com.clothingstore.myandroidapp`-সহ Android app আছে কি না দেখুন। না থাকলে এই package name দিয়ে Android app যোগ করুন। App ID-টি উপরের ID-র সঙ্গে মিলিয়ে নিন।
-3. `app/google-services.json` ইতিমধ্যে repository-তে যোগ করা হয়েছে। উপরের Python check চালিয়ে project ID, package ও App ID মিলে কি না যাচাই করতে পারেন; ফাইলটির নাম বা অবস্থান বদলাবেন না।
-4. **Build → Firestore Database → Create database** থেকে Cloud Firestore তৈরি করুন। Production mode বেছে নিন, পরে repository-র rules প্রকাশ করুন। Location সাবধানে নির্বাচন করুন—database তৈরি হলে location সাধারণত বদলানো যায় না। ব্যবহারকারীদের নিকটবর্তী সমর্থিত location বাছুন।
-5. **Firestore Database → Rules**-এ `firestore.rules`-এর সম্পূর্ণ contents paste করে **Publish** করুন। এতে কেবল authenticated Firebase user read/write করতে পারে; unauthenticated request প্রত্যাখ্যাত হবে।
-6. অ্যাপটি আগে থেকেই anonymous Firebase Authentication ব্যবহার করে, যাতে `request.auth != null` শর্ত পূরণ হয়। **Build → Authentication → Sign-in method**-এ **Anonymous** provider enable করুন। এটি enable না থাকলে sign-in ও remote sync ব্যর্থ হবে।
-7. Anonymous sign-in-এর জন্য SHA-1 প্রয়োজন নেই। ভবিষ্যতে Google Sign-In, Phone Auth বা অন্য certificate-sensitive provider যোগ করলে সেই provider-এর নির্দেশনা অনুযায়ী SHA-1/SHA-256 লাগতে পারে; এই পরিবর্তনে নতুন provider যোগ করা হয়নি।
+`dokane-aa207`-এর Android app configuration যাচাই করা হয়েছে, default Firestore database আগে থেকেই আছে (`asia-south1`), Anonymous Authentication provider enable করা হয়েছে, এবং repository-র `firestore.rules` policy প্রকাশ করা হয়েছে। বিদ্যমান `imran_store/backup` ডকুমেন্ট ও data মুছে বা overwrite করা হয়নি—নতুন database তৈরি করবেন না।
 
-> এই rules অনুযায়ী যেকোনো authenticated account—anonymous account-সহ—Firestore-এর **সব document** read/write করতে পারে। এটি চাওয়া `request.auth != null` নীতির ফল। নির্দিষ্ট user/store-এ সীমাবদ্ধ করতে user-scoped rules ও data model দরকার; বর্তমান shared backup schema বদলানো হয়নি।
+> **Rules-এর পরিসর:** published rule অনুযায়ী যেকোনো authenticated account—anonymous account-সহ—Firestore-এর সব document read/write করতে পারে; unauthenticated request প্রত্যাখ্যাত হয়। একই project-এর `hisab` web app sign-in না করলে তার Firestore access বন্ধ হতে পারে। নির্দিষ্ট user/store-এ সীমাবদ্ধ করতে user-scoped rules ও data model দরকার; বর্তমান shared backup schema বদলানো হয়নি।
+
+Anonymous sign-in-এর জন্য SHA-1 প্রয়োজন নেই। ভবিষ্যতে Google Sign-In, Phone Auth বা অন্য certificate-sensitive provider যোগ করলে সেই provider-এর নির্দেশনা অনুযায়ী SHA-1/SHA-256 লাগতে পারে; এই পরিবর্তনে নতুন provider যোগ করা হয়নি।
 
 ## Build ও অ্যাপ পরীক্ষা
 
