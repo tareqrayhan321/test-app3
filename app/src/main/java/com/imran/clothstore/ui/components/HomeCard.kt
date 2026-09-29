@@ -95,7 +95,8 @@ fun MiniArtCard(
     onClick: () -> Unit,
     art: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    labelColor: Color = AppColors.TextPrimary
+    labelColor: Color = AppColors.TextPrimary,
+    subtitle: String? = null
 ) {
     Box(
         modifier = modifier
@@ -122,6 +123,17 @@ fun MiniArtCard(
                 color = labelColor,
                 modifier = Modifier.padding(top = 8.dp)
             )
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    fontSize = 9.sp,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    color = Color(0xFF3D3B36),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 3.dp)
+                )
+            }
         }
     }
 }

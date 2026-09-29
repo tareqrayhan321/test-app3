@@ -34,12 +34,12 @@ import com.imran.clothstore.R
 import com.imran.clothstore.ui.theme.AppColors
 
 /**
- * অ্যাপ টাইটেলের ফন্ট: Li Alinur Banglaborno (Unicode)। ফাইল: res/font/alinur_banglaborno.ttf
+ * অ্যাপ টাইটেলের ফন্ট: Li Alinur Sangbadpatra (Unicode)। ফাইল: res/font/alinur_sangbadpatra.ttf
  * এই ফন্টের আলাদা Bold ফাইল নেই, তাই FontWeight.Normal ব্যবহার করা হয়েছে — নইলে Android
  * নিজে থেকে কৃত্রিম বোল্ড বসিয়ে অক্ষর বিকৃত করত।
  */
 private val AlinurFontFamily = FontFamily(
-    Font(R.font.alinur_banglaborno, FontWeight.Normal)
+    Font(R.font.alinur_sangbadpatra, FontWeight.Normal)
 )
 
 /**
