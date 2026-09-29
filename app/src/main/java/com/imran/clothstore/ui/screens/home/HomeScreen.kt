@@ -65,6 +65,7 @@ fun HomeScreen(
     notifViewModel: NotificationViewModel = viewModel()
 ) {
     val hasUnread by notifViewModel.hasUnread.collectAsState()
+    val summaries by viewModel.summaries.collectAsState()
 
     // মিনি-কার্ডের উচ্চতা (140dp) এর প্রায় অর্ধেক হেডারের ভেতরে, বাকি অর্ধেক বডিতে
     val overlap = HeaderCardOverlap
@@ -131,7 +132,7 @@ fun HomeScreen(
             item {
                 HomeCard(
                     title = "Regular Customers",
-                    statText = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER),
+                    statText = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_CUSTOMER) },
                     art = { CustomerArt() }
                 )
@@ -139,7 +140,7 @@ fun HomeScreen(
             item {
                 HomeCard(
                     title = "Irregular Customers",
-                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER),
+                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_CUSTOMER) },
                     art = { CustomerIrregularArt() }
                 )
@@ -147,7 +148,7 @@ fun HomeScreen(
             item {
                 HomeCard(
                     title = "Regular Suppliers",
-                    statText = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER),
+                    statText = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_SUPPLIER) },
                     art = { SupplierTruckArt() }
                 )
@@ -155,7 +156,7 @@ fun HomeScreen(
             item {
                 HomeCard(
                     title = "Irregular Suppliers",
-                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER),
+                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_SUPPLIER) },
                     art = { SupplierIrregularArt() }
                 )
