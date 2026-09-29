@@ -1,15 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.kotlin.plugin.compose")
-}
-
-// The repository does not contain the project-specific config file. Apply the
-// plugin automatically as soon as app/google-services.json is supplied.
-if (file("google-services.json").isFile) {
-    apply(plugin = "com.google.gms.google-services")
 }
 
 android {

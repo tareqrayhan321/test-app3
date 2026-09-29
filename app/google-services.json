@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "394082302202",
+    "project_id": "dokane-aa207",
+    "storage_bucket": "dokane-aa207.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394082302202:android:90286952d31ad6fbcff143",
+        "android_client_info": {
+          "package_name": "com.clothingstore.myandroidapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbuYXqykNfcGi9LDOOzYexY5Q1e4uiMhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

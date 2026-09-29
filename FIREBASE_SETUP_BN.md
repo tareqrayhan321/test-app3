@@ -2,9 +2,9 @@
 
 এই Android অ্যাপ Firestore-এর বিদ্যমান ওয়েব-সামঞ্জস্যপূর্ণ `imran_store/backup` ডকুমেন্ট ব্যবহার করে। UI প্রথমে Room লোকাল ক্যাশ পড়ে; নেটওয়ার্ক থাকলে WorkManager পরিবর্তন sync করে। Firestore snapshot listener দূরের পরিবর্তন শনাক্ত করে sync worker চালায়। Android Firestore SDK-তে offline persistence ডিফল্টভাবে চালু; Room cache-ও offline-first আচরণ ধরে রাখে।
 
-## গুরুত্বপূর্ণ: `google-services.json` পাওয়া যায়নি
+## Firebase configuration যুক্ত করা হয়েছে
 
-রিপোজিটরি ও সংযুক্ত ফাইলগুলো পরীক্ষা করে `google-services.json` পাওয়া যায়নি। Firebase Console থেকে Android app-এর configuration file ডাউনলোড করে `app/google-services.json`-এ রাখুন। ফাইলটি থাকলেই Gradle Google Services plugin স্বয়ংক্রিয়ভাবে প্রয়োগ হবে। ফাইল ছাড়া debug build করা যায়, কিন্তু Firebase runtime-এ সংযোগ হবে না।
+আপনার দেওয়া `google-services.json` ফাইলটি `app/google-services.json`-এ যোগ করা হয়েছে এবং project ID, Android package ও Android App ID যাচাই করা হয়েছে। App module-এ Google Services Gradle plugin সক্রিয়। Firebase Console থেকে JSON আবার ডাউনলোড করে বসাতে হবে না।
 
 Gradle-এর `applicationId` Firebase-এ দেওয়া Android package name `com.clothingstore.myandroidapp`-এর সঙ্গে মেলানো হয়েছে। JSON-এও একই package থাকতে হবে। যাচাই করুন:
 
@@ -27,7 +27,7 @@ PY
 
 1. [Firebase Console](https://console.firebase.google.com/)-এ বিদ্যমান `dokane-aa207` project খুলুন।
 2. **Project settings → General → Your apps**-এ package name `com.clothingstore.myandroidapp`-সহ Android app আছে কি না দেখুন। না থাকলে এই package name দিয়ে Android app যোগ করুন। App ID-টি উপরের ID-র সঙ্গে মিলিয়ে নিন।
-3. ওই Android app-এর `google-services.json` ডাউনলোড করে project root নয়, `app/google-services.json`-এ রাখুন। ফাইলের শেষে `(1)`/`(2)` যেন না থাকে। উপরের Python check-এ project ID, package ও App ID মিলিয়ে নিন।
+3. `app/google-services.json` ইতিমধ্যে repository-তে যোগ করা হয়েছে। উপরের Python check চালিয়ে project ID, package ও App ID মিলে কি না যাচাই করতে পারেন; ফাইলটির নাম বা অবস্থান বদলাবেন না।
 4. **Build → Firestore Database → Create database** থেকে Cloud Firestore তৈরি করুন। Production mode বেছে নিন, পরে repository-র rules প্রকাশ করুন। Location সাবধানে নির্বাচন করুন—database তৈরি হলে location সাধারণত বদলানো যায় না। ব্যবহারকারীদের নিকটবর্তী সমর্থিত location বাছুন।
 5. **Firestore Database → Rules**-এ `firestore.rules`-এর সম্পূর্ণ contents paste করে **Publish** করুন। এতে কেবল authenticated Firebase user read/write করতে পারে; unauthenticated request প্রত্যাখ্যাত হবে।
 6. অ্যাপটি আগে থেকেই anonymous Firebase Authentication ব্যবহার করে, যাতে `request.auth != null` শর্ত পূরণ হয়। **Build → Authentication → Sign-in method**-এ **Anonymous** provider enable করুন। এটি enable না থাকলে sign-in ও remote sync ব্যর্থ হবে।
@@ -37,7 +37,7 @@ PY
 
 ## Build ও অ্যাপ পরীক্ষা
 
-1. JSON ফাইল যোগ করার পরে project root থেকে চালান:
+1. Project root থেকে build চালান:
 
    ```bash
    ./gradlew assembleDebug
