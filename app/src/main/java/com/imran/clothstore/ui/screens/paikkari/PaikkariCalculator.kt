@@ -88,14 +88,14 @@ data class PaikkariResult(
 fun validatePaikkariInput(input: PaikkariInput): ValidationError? {
     val totalSale = input.cashSale + input.creditSale
     if (totalSale <= 0) {
-        return ValidationError("⚠️ বিক্রির পরিমাণ শূন্য হতে পারবে না। অনুগ্রহ করে Purchase ও Sale তথ্য পূরণ করুন।", goToStep = 3)
+        return ValidationError("বিক্রির পরিমাণ শূন্য হতে পারবে না। অনুগ্রহ করে Purchase ও Sale তথ্য পূরণ করুন।", goToStep = 3)
     }
     if (input.soldGaj <= 0 || input.profitGaj <= 0) {
-        return ValidationError("⚠️ Stock ধাপে বিক্রিত গজ ও প্রতি গজে লাভ পূরণ করুন।", goToStep = 2)
+        return ValidationError("Stock ধাপে বিক্রিত গজ ও প্রতি গজে লাভ পূরণ করুন।", goToStep = 2)
     }
     val purchaseMoney = input.cashPurchase + input.creditPurchase
     if (purchaseMoney > 0 && input.stockInYard <= 0) {
-        return ValidationError("⚠️ ক্রয়ের টাকা দিয়েছ, তাই Stock ধাপে ক্রয়কৃত গজ পূরণ করুন।", goToStep = 2)
+        return ValidationError("ক্রয়ের টাকা দিয়েছ, তাই Stock ধাপে ক্রয়কৃত গজ পূরণ করুন।", goToStep = 2)
     }
     return null
 }

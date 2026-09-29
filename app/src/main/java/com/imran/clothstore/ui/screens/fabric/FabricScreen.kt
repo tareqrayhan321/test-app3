@@ -107,7 +107,6 @@ fun FabricScreen(
         if (groups.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🧵", fontSize = 32.sp)
                     Text(
                         "এখনো কোনো কাপড় ক্রয় যোগ করা হয়নি",
                         fontSize = 13.sp,

@@ -65,7 +65,7 @@ fun DbConnectModal(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("☁️ ফায়ারবেস ডাটাবেইজ", color = Color(0xFFE0B84A), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("ফায়ারবেস ডাটাবেইজ", color = Color(0xFFE0B84A), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(
                 "✕",
                 color = Color.White,
@@ -125,7 +125,7 @@ fun DbConnectModal(
                 .padding(12.dp)
         ) {
             Text(
-                "ℹ️ এই অ্যাপ ও ওয়েব অ্যাপ একই ডেটা শেয়ার করে",
+                "এই অ্যাপ ও ওয়েব অ্যাপ একই ডেটা শেয়ার করে",
                 color = Color(0xFF9FD3E8),
                 fontSize = 11.5.sp,
                 fontWeight = FontWeight.SemiBold
@@ -148,7 +148,7 @@ fun DbConnectModal(
                 onClick = { viewModel.checkConnection() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("🔄 সংযোগ পুনরায় যাচাই করুন", fontSize = 13.sp)
+                Text("সংযোগ পুনরায় যাচাই করুন", fontSize = 13.sp)
             }
 
             Button(
@@ -162,7 +162,7 @@ fun DbConnectModal(
                 if (isWiping) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White)
                 } else {
-                    Text("🗑️ ক্লাউড ডেটা মুছে ফেলো", fontSize = 13.sp)
+                    Text("ক্লাউড ডেটা মুছে ফেলো", fontSize = 13.sp)
                 }
             }
 

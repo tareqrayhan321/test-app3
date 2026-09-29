@@ -56,7 +56,7 @@ fun DlQuickJomaDialog(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "💰 জমা এন্ট্রি",
+                    text = "জমা এন্ট্রি",
                     color = Color(0xFFE0B84A),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold

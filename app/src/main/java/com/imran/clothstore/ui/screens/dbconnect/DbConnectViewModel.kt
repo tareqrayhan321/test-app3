@@ -67,7 +67,7 @@ class DbConnectViewModel(
             try {
                 repository.wipeAll()
                 com.imran.clothstore.ui.screens.notif.NotificationCenter.push(
-                    "error", "🗑️ ক্লাউডের সব ডেটা মুছে ফেলা হয়েছে"
+                    "error", "ক্লাউডের সব ডেটা মুছে ফেলা হয়েছে"
                 )
                 _isWiping.value = false
                 onComplete(true, false)

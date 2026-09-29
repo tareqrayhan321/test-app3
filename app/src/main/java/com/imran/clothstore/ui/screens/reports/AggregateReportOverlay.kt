@@ -85,7 +85,7 @@ fun AggregateReportOverlay(
 
         if (reports.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("📊 এখনো কোনো সাপ্তাহিক হিসাব যোগ করা হয়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
+                Text("এখনো কোনো সাপ্তাহিক হিসাব যোগ করা হয়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
             }
             return@Column
         }
@@ -147,7 +147,7 @@ fun AggregateReportOverlay(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "ডিলিট মোড চালু — সারি মুছতে 🗑️ আইকনে ট্যাপ করুন",
+                    "ডিলিট মোড চালু — সারি মুছতে ডিলিট আইকনে ট্যাপ করুন",
                     fontSize = 11.sp,
                     color = Color(0xFFD9452B),
                     modifier = Modifier.combinedClickable(onClick = { deleteMode = false })

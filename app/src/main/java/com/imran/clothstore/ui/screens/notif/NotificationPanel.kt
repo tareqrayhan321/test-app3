@@ -110,9 +110,14 @@ fun NotificationPanel(
 @Composable
 private fun NotifRow(notif: Notification) {
     val icon = when (notif.type) {
-        "success" -> "✅"
-        "error" -> "⚠️"
-        else -> "☁️"
+        "success" -> androidx.compose.material.icons.Icons.Filled.CheckCircle
+        "error" -> androidx.compose.material.icons.Icons.Filled.Warning
+        else -> androidx.compose.material.icons.Icons.Filled.Cloud
+    }
+    val iconTint = when (notif.type) {
+        "success" -> Color(0xFF1F9D55)
+        "error" -> Color(0xFFD9452B)
+        else -> Color(0xFF2F6DB5)
     }
     val iconBg = when (notif.type) {
         "success" -> Color(0xFFDDF0E3)
@@ -135,7 +140,12 @@ private fun NotifRow(notif: Notification) {
                 .background(iconBg),
             contentAlignment = Alignment.Center
         ) {
-            Text(icon, fontSize = 15.sp)
+            androidx.compose.material3.Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(18.dp)
+            )
         }
         Column(modifier = Modifier.padding(start = 10.dp)) {
             Text(notif.msg, color = Color(0xFF141413), fontSize = 12.5.sp)

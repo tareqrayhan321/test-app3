@@ -57,7 +57,6 @@ fun FundFlowCard(latest: WeeklyReport?) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("🥧", fontSize = 28.sp)
                 Text(
                     "এখনো কোনো হিসাব নেই",
                     fontSize = 12.5.sp,
@@ -128,7 +127,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
 
         if (latest.net < 0) {
             AlertBanner(
-                emoji = "🔴",
+                dot = Color(0xFFD9452B),
                 badge = "CRITICAL LOSS",
                 title = "নিট লোকসান সতর্কতা — Net Loss Alert",
                 desc = "এই সপ্তাহে মোট ব্যয় আয়কে ছাড়িয়ে গেছে। COGS ও পরিচালন ব্যয় পুনর্যাচাই করুন।",
@@ -138,7 +137,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
         }
         if (creditSalesRatio > 0.6) {
             AlertBanner(
-                emoji = "🟡",
+                dot = Color(0xFFE0B84A),
                 badge = "WARNING — Liquidity Risk",
                 title = "তারল্য ঝুঁকি — Credit Sales > 60%",
                 desc = "মোট বিক্রয়ের ৬০%-এর বেশি বাকিতে। নগদ প্রবাহে সমস্যার ঝুঁকি আছে।",
@@ -148,7 +147,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
         }
         if (latest.net > 0 && netCashFlow < 0) {
             AlertBanner(
-                emoji = "🔵",
+                dot = Color(0xFF2F6DB5),
                 badge = "INFO — Accrual Gap",
                 title = "নগদ ঘাটতি — P&L লাভ সত্ত্বেও Cashflow ঋণাত্মক",
                 desc = "বাকি ক্রয় বা বকেয়া পরিশোধ ক্যাশফ্লো কমাচ্ছে।",
@@ -198,7 +197,7 @@ private fun DonutChart(segments: List<PieSegment>, modifier: Modifier = Modifier
 /** dismissAlert() এর সমতুল্য — ✕ ট্যাপ করলে ব্যানার লোকালি বন্ধ হয়ে যায় */
 @Composable
 private fun AlertBanner(
-    emoji: String,
+    dot: Color,
     badge: String,
     title: String,
     desc: String,
@@ -217,7 +216,14 @@ private fun AlertBanner(
             .padding(9.dp),
         verticalAlignment = Alignment.Top
     ) {
-        Text(emoji, fontSize = 15.sp, modifier = Modifier.padding(end = 6.dp))
+        // ইমোজির বদলে সতর্কতার মাত্রা বোঝাতে রঙিন বিন্দু
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .padding(top = 3.dp, end = 8.dp)
+                .size(10.dp)
+                .clip(CircleShape)
+                .background(dot)
+        )
         Column(modifier = Modifier.weight(1f)) {
             Text(badge, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6C5A2A))
             Text(title, fontSize = 11.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,13 +63,13 @@ fun SideMenu(
                 .background(Color.White)
                 .padding(12.dp)
         ) {
-            MenuItem("🏠", "হোম", onNavigateHome)
+            MenuItem(androidx.compose.material.icons.Icons.Filled.Home, "হোম", onNavigateHome)
         }
     }
 }
 
 @Composable
-private fun MenuItem(icon: String, label: String, onClick: () -> Unit) {
+private fun MenuItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -77,7 +78,12 @@ private fun MenuItem(icon: String, label: String, onClick: () -> Unit) {
             .padding(vertical = 12.dp, horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(icon, fontSize = 16.sp)
+        androidx.compose.material3.Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color(0xFF2A2418),
+            modifier = Modifier.size(20.dp)
+        )
         Text(label, fontSize = 14.sp, modifier = Modifier.padding(start = 12.dp), color = Color(0xFF2A2418))
     }
 }

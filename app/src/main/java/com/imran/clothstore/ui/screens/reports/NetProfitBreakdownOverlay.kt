@@ -65,7 +65,7 @@ fun NetProfitBreakdownOverlay(
 
         if (latest == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("📊 এখনো কোনো সাপ্তাহিক হিসাব যোগ করা হয়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
+                Text("এখনো কোনো সাপ্তাহিক হিসাব যোগ করা হয়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
             }
             return@Column
         }
@@ -191,7 +191,7 @@ private fun SummaryNote(report: WeeklyReport) {
         } else {
             "বিক্রয়ের তুলনায় মোট খরচ বেশি হয়ে গেছে।"
         }
-        "⚠️ এই সপ্তাহে ${formatTaka(kotlin.math.abs(report.net))} টাকা লোকসান হয়েছে। $expensePart"
+        "এই সপ্তাহে ${formatTaka(kotlin.math.abs(report.net))} টাকা লোকসান হয়েছে। $expensePart"
     } else {
         val totalExpense = report.opex + report.fixed + report.zakat
         "✓ এই সপ্তাহে ${formatTaka(report.net)} টাকা লাভ হয়েছে। গ্রস প্রফিট ${formatTaka(report.gross)} থেকে সব খরচ (${formatTaka(totalExpense)}) বাদ দেওয়ার পরও নিট মুনাফা রয়ে গেছে।"
