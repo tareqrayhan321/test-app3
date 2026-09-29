@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imran.clothstore.data.model.Notification
+import com.imran.clothstore.ui.theme.AppColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -50,20 +52,27 @@ fun NotificationPanel(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF241505))
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    ),
+                    RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
+                )
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("🔔 নোটিফিকেশন", color = Color(0xFFE0B84A), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("🔔 নোটিফিকেশন", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "সব মুছো",
-                    color = Color(0xFFA09070),
+                    color = Color.White.copy(alpha = 0.8f),
                     fontSize = 12.sp,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
@@ -84,7 +93,7 @@ fun NotificationPanel(
 
         if (notifications.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("কোনো নোটিফিকেশন নেই", color = Color(0xFF8A7A60), fontSize = 13.sp)
+                Text("কোনো নোটিফিকেশন নেই", color = Color(0xFF8A8578), fontSize = 13.sp)
             }
         } else {
             LazyColumn(
@@ -108,16 +117,16 @@ private fun NotifRow(notif: Notification) {
         else -> "☁️"
     }
     val iconBg = when (notif.type) {
-        "success" -> Color(0xFF1E4A2E)
-        "error" -> Color(0xFF4A241E)
-        else -> Color(0xFF1E3A4A)
+        "success" -> Color(0xFFDDF0E3)
+        "error" -> Color(0xFFFBE0DC)
+        else -> Color(0xFFDCEBF5)
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF34220F))
+            .background(AppColors.CardCream)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -131,8 +140,8 @@ private fun NotifRow(notif: Notification) {
             Text(icon, fontSize = 15.sp)
         }
         Column(modifier = Modifier.padding(start = 10.dp)) {
-            Text(notif.msg, color = Color(0xFFF0EAD8), fontSize = 12.5.sp)
-            Text(formatNotifTime(notif.ts), color = Color(0xFF8A7A60), fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
+            Text(notif.msg, color = Color(0xFF141413), fontSize = 12.5.sp)
+            Text(formatNotifTime(notif.ts), color = Color(0xFF6C6A64), fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp))
         }
     }
 }
