@@ -1,0 +1,102 @@
+package com.imran.clothstore.ui.components
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.imran.clothstore.ui.theme.AppColors
+
+/**
+ * ওয়েব অ্যাপের .kpi-strip.kpi-strip-3 → তিনটা .profit-kpi-card এর সমতুল্য।
+ * Weekly Gross / Net / Cash Profit — মান ঋণাত্মক হলে Net/Cash কার্ড লালচে হয়ে "Loss" লেখা দেখায়
+ * (রেফারেন্স স্ক্রিনশট: "Weekly Net Loss" গোলাপি কার্ড, লাল মান)।
+ */
+@Composable
+fun ProfitKpiStrip(
+    grossProfit: String,
+    netProfit: String,
+    cashProfit: String,
+    onNetProfitClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    netIsLoss: Boolean = false,
+    cashIsLoss: Boolean = false
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ProfitKpiCard(
+            label = "Weekly Gross Profit",
+            value = grossProfit,
+            modifier = Modifier.weight(1f)
+        )
+        ProfitKpiCard(
+            label = if (netIsLoss) "Weekly Net Loss" else "Weekly Net Profit",
+            value = netProfit,
+            isLoss = netIsLoss,
+            modifier = Modifier.weight(1f),
+            onClick = onNetProfitClick
+        )
+        ProfitKpiCard(
+            label = if (cashIsLoss) "Weekly Cash Loss" else "Weekly Cash Profit",
+            value = cashProfit,
+            isLoss = cashIsLoss,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun ProfitKpiCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    isLoss: Boolean = false,
+    onClick: (() -> Unit)? = null
+) {
+    val bg = if (isLoss) Color(0xFFFDE8E8) else AppColors.CardCream
+    val border = if (isLoss) Color(0xFFF2A6A6) else AppColors.CardBorder
+    Column(
+        modifier = modifier
+            .height(110.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(bg)
+            .border(BorderStroke(1.dp, border), RoundedCornerShape(16.dp))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = Color(0xFF6C6A64),
+            lineHeight = 16.sp
+        )
+        Text(
+            text = value,
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (isLoss) Color(0xFFC0392B) else Color(0xFF141413),
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
