@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -29,21 +30,25 @@ import com.imran.clothstore.ui.theme.AppColors
 @Composable
 fun SideMenu(
     onClose: () -> Unit,
-    onNavigateHome: () -> Unit,
-    onNavigateDebtorsList: () -> Unit,
-    onNavigateDbConnect: () -> Unit
+    onNavigateHome: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
             .width(280.dp)
-            .background(Color(0xFFF2ECE0))
+            .background(Color.White)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(AppColors.HeaderTeal)
-                .padding(16.dp),
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                    ),
+                    RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
+                )
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp)
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -61,8 +66,6 @@ fun SideMenu(
 
         Column(modifier = Modifier.padding(12.dp)) {
             MenuItem("🏠", "হোম", onNavigateHome)
-            MenuItem("🤝", "পার্টি", onNavigateDebtorsList)
-            MenuItem("🗄️", "ডাটাবেইজ সংযোগ", onNavigateDbConnect)
         }
     }
 }
