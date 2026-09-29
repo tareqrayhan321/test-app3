@@ -13,6 +13,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import com.imran.clothstore.ui.components.AppDateField
+import com.imran.clothstore.ui.components.AppTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,31 +69,14 @@ fun DlQuickJomaDialog(
             }
 
             Column(modifier = Modifier.padding(16.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = { date = it },
-                        label = { Text("তারিখ") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = amount,
-                        onValueChange = { amount = it },
-                        label = { Text("জমার পরিমাণ") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal)
-                    )
-                }
-                OutlinedTextField(
-                    value = note,
-                    onValueChange = { note = it },
-                    label = { Text("মন্তব্য") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    singleLine = true
+                AppDateField(date, { date = it }, "তারিখ", Modifier.fillMaxWidth())
+                AppTextField(
+                    amount, { amount = it }, "জমার পরিমাণ",
+                    Modifier.fillMaxWidth().padding(top = 10.dp), KeyboardType.Decimal
+                )
+                AppTextField(
+                    note, { note = it }, "মন্তব্য",
+                    Modifier.fillMaxWidth().padding(top = 10.dp)
                 )
                 Row(
                     modifier = Modifier
