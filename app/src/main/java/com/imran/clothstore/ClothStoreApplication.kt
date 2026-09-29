@@ -3,6 +3,8 @@ package com.imran.clothstore
 import android.app.Application
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
+import com.imran.clothstore.data.backup.BackupRepository
 import com.imran.clothstore.data.local.AppDatabase
 import com.imran.clothstore.data.local.LocalCacheRepository
 import com.imran.clothstore.data.sync.SyncWorker
@@ -16,6 +18,8 @@ import com.imran.clothstore.ui.screens.notif.NotificationCenter
  * নেটওয়ার্ক ফিরলে স্বয়ংক্রিয়ভাবে Firestore-এ sync হয় (আইটেম #১, দেখুন SyncWorker.kt)।
  */
 class ClothStoreApplication : Application() {
+    private var backupListener: ListenerRegistration? = null
+
     override fun onCreate() {
         super.onCreate()
         NotificationCenter.init(applicationContext)
@@ -33,11 +37,13 @@ class ClothStoreApplication : Application() {
             val auth = FirebaseAuth.getInstance()
             if (auth.currentUser != null) {
                 SyncWorker.schedulePeriodic(applicationContext)
+                startBackupListener()
             } else {
                 auth.signInAnonymously()
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d(TAG, "signInAnonymously: success, uid=${auth.currentUser?.uid}")
+                            startBackupListener()
                         } else {
                             Log.w(TAG, "signInAnonymously: failed", task.exception)
                         }
@@ -48,6 +54,19 @@ class ClothStoreApplication : Application() {
             Log.e(TAG, "Firebase not initialized or missing google-services.json", e)
             // Firebase না থাকলেও অন্তত পিরিয়ডিক সিঙ্ক শিডিউল হোক (যদিও ফায়ারস্টোর ফেইল করবে, লোকাল চলবে)
             SyncWorker.schedulePeriodic(applicationContext)
+        }
+    }
+
+    /** Remote document পরিবর্তনে বিদ্যমান Room/WorkManager sync-কে জাগিয়ে তোলে। */
+    private fun startBackupListener() {
+        try {
+            backupListener?.remove()
+            backupListener = BackupRepository().addRemoteSnapshotListener(
+                onChange = { _ -> SyncWorker.triggerImmediate(applicationContext) },
+                onError = { error -> Log.e(TAG, "Firestore backup listener failed", error) }
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not start Firestore backup listener", e)
         }
     }
 

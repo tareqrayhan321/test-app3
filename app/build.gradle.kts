@@ -1,10 +1,15 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // id("com.google.gms.google-services") // Temporarily disabled
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+// The repository does not contain the project-specific config file. Apply the
+// plugin automatically as soon as app/google-services.json is supplied.
+if (file("google-services.json").isFile) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {
@@ -12,7 +17,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.imran.clothstore"
+        applicationId = "com.clothingstore.myandroidapp"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -64,11 +69,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
 
     // ── Firebase (BoM দিয়ে ভার্সন সিঙ্ক করা) ──
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-analytics")
     // anonymous sign-in — Firestore rules-এ request.auth != null চেক পাস করাতে (আইটেম: auth)
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-auth")
 
     // ── Coroutines with Firestore await() ──
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")

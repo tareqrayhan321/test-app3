@@ -2,6 +2,7 @@ package com.imran.clothstore.data.backup
 
 import android.content.Context
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.imran.clothstore.AppSingletons
 import com.imran.clothstore.data.local.LocalCacheRepository
 import com.imran.clothstore.data.sync.SyncWorker
@@ -69,6 +70,30 @@ class BackupRepository(
     /** SyncWorker এই মেথড দিয়ে Firestore-এ push করে — সরাসরি docRef ব্যবহার, Room জড়িত না */
     suspend fun pushToRemote(payload: BackupPayload) {
         docRef.set(payload).await()
+    }
+
+    /**
+     * Listens to the existing shared backup document. The application uses this signal to
+     * wake the current sync worker, which safely merges remote changes into the Room cache.
+     */
+    fun addRemoteSnapshotListener(
+        onChange: (BackupPayload) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration = docRef.addSnapshotListener { snapshot, error ->
+        if (error != null) {
+            onError(error)
+        } else if (snapshot != null) {
+            val payload = if (snapshot.exists()) {
+                snapshot.toObject(BackupPayload::class.java)
+            } else {
+                BackupPayload()
+            }
+            if (payload == null) {
+                onError(IllegalStateException("Firestore backup document could not be decoded"))
+            } else {
+                onChange(applyTombstones(payload))
+            }
+        }
     }
 
     /**

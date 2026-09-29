@@ -1,6 +1,7 @@
 package com.imran.clothstore.data.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -46,6 +47,7 @@ class SyncWorker(
             val firestore = try {
                 FirebaseFirestore.getInstance()
             } catch (e: Exception) {
+                Log.e(TAG, "Firebase Firestore is unavailable; sync cannot start", e)
                 return Result.failure() // Can't sync without Firebase
             }
             
@@ -58,6 +60,7 @@ class SyncWorker(
             } catch (e: Exception) {
                 // নেটওয়ার্ক নেই বা Firestore আনরিচেবল — এখনো কিছু push করা যায়নি,
                 // পরে আবার চেষ্টা করার জন্য retry() রিটার্ন করা হচ্ছে
+                Log.w(TAG, "Could not read the remote backup; retrying", e)
                 return Result.retry()
             }
 
@@ -83,11 +86,13 @@ class SyncWorker(
 
             Result.success()
         } catch (e: Exception) {
+            Log.e(TAG, "Backup sync failed; WorkManager will retry", e)
             Result.retry()
         }
     }
 
     companion object {
+        private const val TAG = "BackupSyncWorker"
         private const val PERIODIC_WORK_NAME = "backup_sync_periodic"
         private const val ONE_TIME_WORK_NAME = "backup_sync_immediate"
 
