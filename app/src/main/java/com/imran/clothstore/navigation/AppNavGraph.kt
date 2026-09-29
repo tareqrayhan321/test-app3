@@ -1,5 +1,7 @@
 package com.imran.clothstore.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -58,7 +60,16 @@ fun AppNavGraph(
     val notifViewModel: NotificationViewModel = viewModel()
     val homeViewModel: com.imran.clothstore.ui.screens.home.HomeViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = Routes.HOME, modifier = modifier) {
+    // ডিফল্ট NavHost ট্রানজিশন ~৭০০ms ফেড — প্রতিটা ট্যাপ ধীর মনে হতো, তাই তাৎক্ষণিক করা হলো
+    NavHost(
+        navController = navController,
+        startDestination = Routes.HOME,
+        modifier = modifier,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) {
 
         composable(Routes.HOME) {
             HomeScreen(
