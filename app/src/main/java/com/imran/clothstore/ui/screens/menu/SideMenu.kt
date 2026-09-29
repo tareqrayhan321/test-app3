@@ -48,7 +48,7 @@ fun SideMenu(
                     RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
                 )
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
