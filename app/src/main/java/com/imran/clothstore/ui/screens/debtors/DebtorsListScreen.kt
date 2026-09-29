@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -15,9 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -31,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -145,22 +150,44 @@ fun DebtorsListScreen(
                 Text("কোনো এন্ট্রি পাওয়া যায়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
             }
         } else {
-            LazyColumn(modifier = Modifier.weight(1f, fill = true).fillMaxWidth()) {
-                item {
-                    // টেবিল হেডার
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(vertical = 8.dp, horizontal = 4.dp)
-                    ) {
-                        Text("পার্টির নাম", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(90.dp))
-                        Text("পাওনা/বকেয়া", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(64.dp))
-                        Text("ঠিকানা", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(90.dp))
+            // নামের কলামের প্রস্থ = সবচেয়ে লম্বা নাম যতটা জায়গা নেয় ততটা (নাম কখনো কাটা পড়বে না);
+            // টেবিল চওড়া হলে পাশে স্ক্রল করে বাকি অংশ দেখা যাবে।
+            val textMeasurer = rememberTextMeasurer()
+            val density = LocalDensity.current
+            val nameStyle = LocalTextStyle.current.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            val nameColWidth = remember(rows, nameStyle, density) {
+                val maxPx = rows.maxOfOrNull { r ->
+                    textMeasurer.measure(
+                        text = r.entry.name.ifBlank { "—" },
+                        style = nameStyle,
+                        softWrap = false
+                    ).size.width
+                } ?: 0
+                with(density) { maxOf(90.dp, maxPx.toDp() + 8.dp) }
+            }
+
+            BoxWithConstraints(modifier = Modifier.weight(1f, fill = true).fillMaxWidth()) {
+                val tableWidth = maxOf(maxWidth, nameColWidth + 280.dp)
+                Box(modifier = Modifier.fillMaxSize().horizontalScroll(rememberScrollState())) {
+                    LazyColumn(modifier = Modifier.width(tableWidth).fillMaxHeight()) {
+                        item {
+                            // টেবিল হেডার
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White)
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                            ) {
+                                Text("পার্টির নাম", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(nameColWidth))
+                                Text("পাওনা/বকেয়া", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(64.dp))
+                                Text("ঠিকানা", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(90.dp))
+                            }
+                        }
+                        // ডুপ্লিকেট id থাকলেও যেন অ্যাপ ক্র্যাশ না করে — তাই key-তে ইনডেক্সও আছে
+                        itemsIndexed(rows, key = { index, it -> "${it.category.name}_${it.entry.id}_$index" }) { _, row ->
+                            DlTableRow(row = row, nameWidth = nameColWidth, onJomaClick = { jomaDialogRow = row })
+                        }
                     }
-                }
-                items(rows, key = { "${it.category.name}_${it.entry.id}" }) { row ->
-                    DlTableRow(row = row, onJomaClick = { jomaDialogRow = row })
                 }
             }
 

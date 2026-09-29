@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -30,7 +31,7 @@ import androidx.compose.ui.unit.sp
  * ঠিক পাঁচ কলামের কাঠামো (fv-excel টেবিলের সমতুল্য)।
  */
 @Composable
-fun DlTableRow(row: DebtorRow, onJomaClick: () -> Unit) {
+fun DlTableRow(row: DebtorRow, nameWidth: Dp, onJomaClick: () -> Unit) {
     val entry = row.entry
     val baki = entry.baki
     val isZero = baki == 0.0
@@ -45,8 +46,8 @@ fun DlTableRow(row: DebtorRow, onJomaClick: () -> Unit) {
             text = entry.name.ifBlank { "—" },
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(90.dp),
-            maxLines = 1
+            modifier = Modifier.width(nameWidth),
+            softWrap = false
         )
         Text(
             text = "৳${baki.toLong()}",

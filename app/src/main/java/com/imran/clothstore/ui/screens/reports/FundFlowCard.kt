@@ -59,7 +59,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
             ) {
                 Text(
                     "এখনো কোনো হিসাব নেই",
-                    fontSize = 12.5.sp,
+                    fontSize = 10.5.sp,
                     color = Color(0xFF9A96AD),
                     modifier = Modifier.padding(top = 6.dp)
                 )
@@ -77,7 +77,7 @@ fun FundFlowCard(latest: WeeklyReport?) {
         ).filter { it.value > 0 }
 
         if (segments.isEmpty()) {
-            Text("এখনো কোনো হিসাব নেই", fontSize = 12.5.sp, color = Color(0xFF9A96AD))
+            Text("এখনো কোনো হিসাব নেই", fontSize = 10.5.sp, color = Color(0xFF9A96AD))
             return@Column
         }
 
@@ -87,14 +87,6 @@ fun FundFlowCard(latest: WeeklyReport?) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(130.dp), contentAlignment = Alignment.Center) {
                 DonutChart(segments = segments, modifier = Modifier.size(130.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("আয়", fontSize = 11.sp, color = Color(0xFF6C6A64))
-                    Text(
-                        formatCompactTaka(latest.cashIn),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
             Column(
                 modifier = Modifier
@@ -225,14 +217,14 @@ private fun AlertBanner(
                 .background(dot)
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text(badge, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6C5A2A))
-            Text(title, fontSize = 11.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
-            Text(desc, fontSize = 10.sp, color = Color(0xFF5A5648), modifier = Modifier.padding(top = 2.dp))
-            Text(action, fontSize = 9.5.sp, color = Color(0xFF6C6A64), modifier = Modifier.padding(top = 3.dp))
+            Text(badge, fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6C5A2A))
+            Text(title, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
+            Text(desc, fontSize = 8.5.sp, color = Color(0xFF5A5648), modifier = Modifier.padding(top = 2.dp))
+            Text(action, fontSize = 8.sp, color = Color(0xFF6C6A64), modifier = Modifier.padding(top = 3.dp))
         }
         Text(
             "✕",
-            fontSize = 13.sp,
+            fontSize = 11.sp,
             color = Color(0xFF9A96AD),
             modifier = Modifier
                 .padding(start = 6.dp)
@@ -260,18 +252,18 @@ private fun LegendRow(
         Box(modifier = Modifier.size(11.dp).clip(CircleShape).background(color))
         Text(
             text = label,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 7.dp),
             maxLines = 1
         )
         if (percent.isNotEmpty()) {
-            Text(percent, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 4.dp))
+            Text(percent, fontSize = 9.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 4.dp))
         }
         Text(
             text = amount,
-            fontSize = 11.sp,
+            fontSize = 9.5.sp,
             color = amountColor,
             fontWeight = if (amountColor == Color(0xFF8A877E)) FontWeight.Normal else FontWeight.Bold,
             modifier = Modifier.padding(start = 6.dp)

@@ -38,8 +38,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * ওয়েব অ্যাপের dbOverlay (ডাটাবেইজ সংযোগ মোডাল) এর সরাসরি Kotlin/Compose সংস্করণ।
- * এই Android অ্যাপ Firestore-নেটিভ বলে dbPush()/dbPull() নেই — বরং সংযোগ স্ট্যাটাস
- * ও ঝুঁকিপূর্ণ "ক্লাউড ডেটা মুছে ফেলো" অ্যাকশন (dbConfirmWipe) রাখা হয়েছে।
+ * এই Android অ্যাপ Firestore-নেটিভ বলে dbPush()/dbPull() নেই — শুধু সংযোগ স্ট্যাটাস ও
+ * সিঙ্ক যাচাইয়ের বাটন আছে (ক্লাউড ডেটা মুছে ফেলার বাটন সরিয়ে দেওয়া হয়েছে)।
  */
 @Composable
 fun DbConnectModal(
@@ -48,11 +48,6 @@ fun DbConnectModal(
 ) {
     val connectionState by viewModel.connectionState.collectAsState()
     val lastSyncText by viewModel.lastSyncText.collectAsState()
-    val isWiping by viewModel.isWiping.collectAsState()
-    var showWipeConfirm by remember { mutableStateOf(false) }
-    var wipeResultMsg by remember { mutableStateOf<String?>(null) }
-    var secretInput by remember { mutableStateOf("") }
-    var secretError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -148,114 +143,6 @@ fun DbConnectModal(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Firestore যাচাই ও সিঙ্ক করুন", fontSize = 13.sp)
-            }
-
-            Button(
-                onClick = { showWipeConfirm = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9452B)),
-                enabled = !isWiping
-            ) {
-                if (isWiping) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White)
-                } else {
-                    Text("ক্লাউড ডেটা মুছে ফেলো", fontSize = 13.sp)
-                }
-            }
-
-            Text(
-                text = "সাবধান: এটি Firestore-এর সব কাস্টমার/মহাজন এন্ট্রি, কাপড় ক্রয় তালিকা, ও " +
-                    "সাপ্তাহিক রিপোর্ট স্থায়ীভাবে মুছে ফেলবে (imran_store/backup পুরো খালি হয়ে যাবে)। " +
-                    "এই কাজ ফিরিয়ে আনা যাবে না। ওয়েব অ্যাপও একই ডেটা হারাবে যেহেতু দুটো অ্যাপ একই নথি শেয়ার করে।",
-                color = Color(0xFF6C6A64),
-                fontSize = 11.sp,
-                modifier = Modifier.padding(top = 10.dp),
-                lineHeight = 16.sp
-            )
-
-            wipeResultMsg?.let { msg ->
-                Text(
-                    text = msg,
-                    color = Color(0xFF9A6B00),
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
-        }
-    }
-
-    if (showWipeConfirm) {
-        Dialog(onDismissRequest = { showWipeConfirm = false }) {
-            Column(
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(14.dp))
-                    .padding(20.dp)
-            ) {
-                Text("নিশ্চিত করুন", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    "সত্যিই কি ক্লাউডের সব ডেটা মুছে ফেলতে চান? এই কাজ ফিরিয়ে আনা সম্ভব নয়।",
-                    fontSize = 12.5.sp,
-                    color = Color(0xFF5A5648),
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-                OutlinedTextField(
-                    shape = androidx.compose.foundation.shape.CircleShape,
-                    value = secretInput,
-                    onValueChange = {
-                        secretInput = it
-                        secretError = false
-                    },
-                    label = { Text("নিরাপত্তা কী দিন", fontSize = 12.sp) },
-                    visualTransformation = PasswordVisualTransformation(),
-                    isError = secretError,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 14.dp)
-                )
-                if (secretError) {
-                    Text(
-                        "ভুল কী — ডেটা মোছা হয়নি",
-                        color = Color(0xFFD9452B),
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            showWipeConfirm = false
-                            secretInput = ""
-                            secretError = false
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("বাতিল")
-                    }
-                    Button(
-                        onClick = {
-                            viewModel.wipeAllCloudData(secretInput) { success, wrongSecret ->
-                                if (wrongSecret) {
-                                    secretError = true
-                                } else {
-                                    showWipeConfirm = false
-                                    secretInput = ""
-                                    wipeResultMsg = if (success) "✓ সব ডেটা মুছে ফেলা হয়েছে" else "✗ মুছতে ব্যর্থ হয়েছে, আবার চেষ্টা করুন"
-                                }
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD9452B))
-                    ) {
-                        Text("হ্যাঁ, মুছে ফেলুন", color = Color.White)
-                    }
-                }
             }
         }
     }

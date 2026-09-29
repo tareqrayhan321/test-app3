@@ -65,14 +65,14 @@ fun formatDate(isoDate: String): String {
     }
 }
 
-/** কার্ডের সংক্ষিপ্ত টাকা লেবেল: "৩.৫লট" (লক্ষ টাকা), "১০.৫হাট" (হাজার টাকা), ঋণাত্মক হলে "-" প্রিফিক্স।
- *  ওয়েব অ্যাপের ডোনাট লেজেন্ডে যেমন দেখা যায় (রেফারেন্স স্ক্রিনশট)। */
+/** কার্ডের সংক্ষিপ্ত সংখ্যা লেবেল: "৩.৫ল" (লক্ষ), "১০.৫হা" (হাজার), ঋণাত্মক হলে "-" প্রিফিক্স।
+ *  টাকা বোঝাতে আলাদা "ট"/"৳" লেখা হয় না। */
 fun formatCompactTaka(v: Double): String {
     val a = abs(v)
     val body = when {
-        a >= 100000 -> "%.1fলট".format(Locale.US, a / 100000)
-        a >= 1000 -> "%.1fহাট".format(Locale.US, a / 1000)
-        else -> round(a).toLong().toString() + "৳"
+        a >= 100000 -> "%.1fল".format(Locale.US, a / 100000)
+        a >= 1000 -> "%.1fহা".format(Locale.US, a / 1000)
+        else -> round(a).toLong().toString()
     }
     return ((if (v < 0) "-" else "") + body).toBengaliDigits()
 }

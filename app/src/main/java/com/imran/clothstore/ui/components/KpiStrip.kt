@@ -93,12 +93,12 @@ private fun ProfitKpiCard(
     ) {
         Text(
             text = label,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             color = Color(0xFF6C6A64),
-            lineHeight = 16.sp
+            lineHeight = 14.sp
         )
         // সংখ্যা এক লাইনে থাকবে; না আঁটলে ফন্ট ধাপে ধাপে ছোট হবে (কাটা পড়বে না)
-        var valueSize by remember(value) { mutableStateOf(15.sp) }
+        var valueSize by remember(value) { mutableStateOf(13.sp) }
         var ready by remember(value) { mutableStateOf(false) }
         Text(
             text = value,

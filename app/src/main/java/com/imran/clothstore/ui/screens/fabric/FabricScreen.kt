@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -137,7 +137,7 @@ fun FabricScreen(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)
             ) {
-                items(groups, key = { it.id }) { group ->
+                itemsIndexed(groups, key = { index, it -> "${it.id}_$index" }) { _, group ->
                     FabricGroupCard(
                         group = group,
                         onAddMore = { qty, rate, onError ->

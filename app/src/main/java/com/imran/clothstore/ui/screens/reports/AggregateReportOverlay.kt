@@ -14,7 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -127,8 +127,10 @@ fun AggregateReportOverlay(
                 }
             }
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(reports, key = { it.id }) { report ->
+            // চওড়া = কলামগুলোর যোগফল (অনুভূমিক স্ক্রলের ভেতরে অসীম প্রস্থ এড়াতে); সারি বেশি হলে ফুটার যেন নিচে থাকে
+            LazyColumn(modifier = Modifier.width(colWidths.fold(0.dp) { acc, w -> acc + w }).weight(1f, fill = false)) {
+                // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
+                itemsIndexed(reports, key = { index, it -> "${it.id}_${it.ts}_$index" }) { _, report ->
                     AggReportRow(
                         report = report,
                         colWidths = colWidths,

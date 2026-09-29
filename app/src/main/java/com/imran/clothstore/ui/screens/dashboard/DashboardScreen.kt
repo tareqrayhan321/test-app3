@@ -119,10 +119,10 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Aggregate Report", fontSize = 20.sp, fontWeight = FontWeight.Normal, fontFamily = androidx.compose.ui.text.font.FontFamily.Serif)
+                    Text("Aggregate Report", fontSize = 16.sp, fontWeight = FontWeight.Normal, fontFamily = androidx.compose.ui.text.font.FontFamily.Serif)
                     Text(
                         text = if (reports.isEmpty()) "কোনো ডাটা নেই" else "${reports.size.toBengaliDigits()} সপ্তাহের ডাটা",
-                        fontSize = 13.sp,
+                        fontSize = 11.sp,
                         color = Color(0xFF6C6A64)
                     )
                 }
@@ -171,8 +171,8 @@ fun DashboardScreen(
                 Text(
                     text = "চলতি সপ্তাহের আর্থিক লেনদেনের সমস্ত তথ্য ইনপুট দিয়ে আপনার ব্যবসায়ের হিসাবগুলো হালনাগাদ রাখুন।",
                     color = Color(0xFFFFC107),
-                    fontSize = 19.sp,
-                    lineHeight = 30.sp,
+                    fontSize = 15.sp,
+                    lineHeight = 23.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
@@ -184,7 +184,7 @@ fun DashboardScreen(
                 ) {
                     Text(
                         "সাপ্তাহিক তথ্য হালনাগাদ",
-                        fontSize = 17.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
@@ -205,8 +205,8 @@ private fun AggStatBox(label: String, value: String, modifier: Modifier = Modifi
             .background(Color(0xFFEFE9DD))
             .padding(vertical = 12.dp, horizontal = 14.dp)
     ) {
-        Text(label, fontSize = 14.sp, color = Color(0xFF6C6A64))
-        Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
+        Text(label, fontSize = 11.5.sp, color = Color(0xFF6C6A64))
+        Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
     }
 }
 
