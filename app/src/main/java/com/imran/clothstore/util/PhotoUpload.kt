@@ -30,9 +30,21 @@ object PhotoUpload {
      * (ওয়েব অ্যাপের approxBytes চেক অনুযায়ী)।
      */
     fun compressToDataUrl(contentResolver: ContentResolver, uri: Uri): Result {
+        // প্রথমে শুধু মাপ পড়ে inSampleSize ঠিক করা — নাহলে ১২MP ছবি পুরোটা (~৪৮MB) মেমরিতে নামত
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        try {
+            contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+        } catch (e: Exception) {
+            return Result.Error("ফাইল পড়া যায়নি")
+        }
+        var sample = 1
+        val maxSide = maxOf(bounds.outWidth, bounds.outHeight)
+        while (maxSide > 0 && maxSide / (sample * 2) >= MAX_SIZE_PX) sample *= 2
+        val decodeOpts = BitmapFactory.Options().apply { inSampleSize = sample }
+
         val bitmap = try {
             contentResolver.openInputStream(uri)?.use { stream ->
-                BitmapFactory.decodeStream(stream)
+                BitmapFactory.decodeStream(stream, null, decodeOpts)
             } ?: return Result.Error("ছবি লোড হয়নি")
         } catch (e: Exception) {
             return Result.Error("ফাইল পড়া যায়নি")
