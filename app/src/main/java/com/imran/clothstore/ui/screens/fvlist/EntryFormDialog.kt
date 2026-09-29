@@ -1,4 +1,4 @@
-package com.imran.clothstore.ui.screens.fvlist
+package com.imran.clothstore.ui.screens/fvlist
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -91,7 +92,7 @@ fun EntryFormDialog(
     var photoStatus by remember { mutableStateOf("") }
     var photoUploading by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -126,15 +127,17 @@ fun EntryFormDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
     ) {
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        // imePadding: কিবোর্ড উঠলে ফর্মের উচ্চতা কিবোর্ডের উপর পর্যন্ত সীমিত হয়; সেভ সারি স্ক্রলের বাইরে
+        // নিচে আটকানো থাকে, তাই কিবোর্ড খোলা থাকলেও ✓ সেভ করুন বাটন দেখা যায়।
+        Box(modifier = Modifier.fillMaxWidth().imePadding(), contentAlignment = Alignment.TopCenter) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(EfCream, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                     .statusBarsPadding()
                     .padding(horizontal = 14.dp, vertical = 16.dp)
-                    .verticalScroll(rememberScrollState())
             ) {
+              Column(modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                 // ── ছবি আপলোড বৃত্ত ──
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -159,7 +162,7 @@ fun EntryFormDialog(
                                 modifier = Modifier.size(62.dp).clip(CircleShape)
                             )
                         } else {
-                            Icon(Icons.Filled.CameraAlt, contentDescription = "ছবি যুক্ত করুন", tint = Color(0xFF4A4740), modifier = Modifier.size(28.dp))
+                            Icon(Icons.Filled.CameraAlt, contentDescription = "ছব��� যুক্ত করুন", tint = Color(0xFF4A4740), modifier = Modifier.size(28.dp))
                         }
                     }
                     Text(
@@ -207,6 +210,7 @@ fun EntryFormDialog(
 
                 // ── মন্তব্য (পুরো প্রস্থ) ──
                 AppTextField(note, { note = it }, "মন্তব্য", Modifier.padding(top = 14.dp).fillMaxWidth())
+              }
 
                 // ── নিচের সারি: ✕ (বৃত্ত) + ✓ সেভ করুন ──
                 Row(

@@ -6,7 +6,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -52,7 +51,7 @@ fun TransactionTable(rows: List<TxnRow>) {
                     Text(
                         text = h,
                         modifier = Modifier.padding(horizontal = 6.dp),
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         textAlign = TextAlign.Center,
@@ -67,7 +66,7 @@ fun TransactionTable(rows: List<TxnRow>) {
             Text(
                 text = "কোনো লেনদেন নেই",
                 modifier = Modifier.padding(16.dp),
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 color = Color(0xFF9A96AD)
             )
         }
@@ -97,8 +96,8 @@ fun TransactionTable(rows: List<TxnRow>) {
     }
 }
 
-private val HEADER_H = 40.dp
-private val ROW_H = 38.dp
+private val HEADER_H = 34.dp
+private val ROW_H = 32.dp
 
 @Composable
 private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, align: TextAlign, bold: Boolean = false) {
@@ -111,8 +110,8 @@ private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, 
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 8.dp),
-            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 6.dp),
+            fontSize = 12.sp,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
             color = Color(0xFF141413),
             textAlign = align,

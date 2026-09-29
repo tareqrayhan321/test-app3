@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.DatePicker
@@ -55,10 +60,24 @@ fun AppTextField(
     trailingIcon: (@Composable () -> Unit)? = null,
     readOnly: Boolean = false
 ) {
+    // OutlinedTextField লেবেল ওঠার সময় বর্ডারে যে "কাটা অংশ" (cutout) বানায়, সেটা কন্টেইনারের
+    // রঙসহ কেটে ফেলে — ফলে লেবেলের পেছনে পেজের রঙের একটা চাপ দেখা যেত। তাই কন্টেইনার স্বচ্ছ রেখে
+    // ফিল্ডের রঙ নিজে এঁকেছি (cutout-এর বাইরে), বর্ডারের উপরের রেখা থেকে শুরু করে। ফল��� লেবেলের
+    // নিচের অর্ধেক ফিল্ডের রঙের উপরেই বসে, আলাদা কোনো ব্যাকগ্রাউন্ড থাকে না।
+    // (OutlinedTextField লেবেল থাকলে উপরে ৮dp প্যাডিং যোগ করে; বর্ডার সেখান থেকেই শুরু)
+    val fill = Modifier.drawBehind {
+        val top = 8.dp.toPx()
+        drawRoundRect(
+            color = FieldBg,
+            topLeft = Offset(0f, top),
+            size = Size(size.width, size.height - top),
+            cornerRadius = CornerRadius(12.dp.toPx())
+        )
+    }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier,
+        modifier = modifier.then(fill),
         readOnly = readOnly,
         singleLine = true,
         label = { Text(label, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) },
@@ -68,8 +87,8 @@ fun AppTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = FieldBg,
-            unfocusedContainerColor = FieldBg,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
             focusedBorderColor = AppColors.HeaderTeal,
             unfocusedBorderColor = FieldBorder,
             focusedLabelColor = AppColors.HeaderTeal,
@@ -112,7 +131,7 @@ fun AppDateField(
         // টেক্সট ফিল্ডের উপরের স্বচ্ছ স্তর — পুরো বক্সে ট্যাপ ধরে ক্যালেন্ডার 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .matchParentSize()
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null

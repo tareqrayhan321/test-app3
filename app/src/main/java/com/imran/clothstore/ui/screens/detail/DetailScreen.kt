@@ -53,7 +53,7 @@ fun DetailScreen(
     val entry by viewModel.entry.collectAsState()
     val rows by viewModel.transactionRows.collectAsState()
 
-    var formKind by remember { mutableStateOf<String?>(null) } // "bokeyoa" | "joma" | null
+    var formKind by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) } // "bokeyoa" | "joma" | null
 
     Column(
         modifier = Modifier
@@ -113,7 +113,7 @@ fun DetailScreen(
                 }
             }
         }
-        androidx.compose.foundation.layout.Box(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
@@ -129,12 +129,12 @@ fun DetailScreen(
             TransactionTable(rows = rows)
         }
 
-        // ── স্টিকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
+        // ── স্��িকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFF0EDE6))
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -158,26 +158,28 @@ fun DetailScreen(
                 .background(Color(0xFFF0EDE6))
                 .navigationBarsPadding()
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Button(
                 onClick = { formKind = "joma" },
-                modifier = Modifier.weight(1f).height(60.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.weight(1f).height(42.dp),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F9D55))
             ) {
-                Text("💰 জমা এন্ট্রি", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
+                Text("💰 জমা এন্ট্রি", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = { formKind = "bokeyoa" },
-                modifier = Modifier.weight(1f).height(60.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.weight(1f).height(42.dp),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828))
             ) {
                 Text(
                     if (category.isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
-                    fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
                 )
             }
         }

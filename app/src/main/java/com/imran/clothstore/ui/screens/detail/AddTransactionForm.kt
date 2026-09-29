@@ -3,7 +3,13 @@ package com.imran.clothstore.ui.screens.detail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 
@@ -41,11 +47,18 @@ fun TransactionFormSheet(
     onAddBokeyoa: (memo: String, date: String, goj: String, bill: Double, note: String, joma: Double) -> Unit,
     onAddJoma: (memo: String, date: String, joma: Double, note: String) -> Unit
 ) {
+    // পুরো উচ্চতায় খোলে (আংশিক অবস্থায় আটকে থাকে না), আর কিবোর্ড উঠলে ফর্ম কিবোর্ডের উপরে থাকে।
     androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = Color(0xFFF0E9DA)
     ) {
-        Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 24.dp)) {
+        Column(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding()
+                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
+        ) {
             Text(
                 text = if (kind == "joma") "💰 জমা এন্ট্রি" else if (isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
                 fontSize = 17.sp,
@@ -68,7 +81,7 @@ fun TransactionFormSheet(
 }
 
 @Composable
-private fun BokeyoaMiniForm(
+private fun ColumnScope.BokeyoaMiniForm(
     onSave: (memo: String, date: String, goj: String, bill: Double, note: String, joma: Double) -> Unit
 ) {
     var memo by remember { mutableStateOf("") }
@@ -81,10 +94,17 @@ private fun BokeyoaMiniForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .weight(1f, fill = false)
             .padding(top = 10.dp)
             .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
+        // ফিল্ডগুল�� স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়
+        Column(
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .verticalScroll(rememberScrollState())
+        ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
@@ -97,9 +117,10 @@ private fun BokeyoaMiniForm(
             AppTextField(joma, { joma = it }, "সাথে জমা (ঐচ্ছিক)", Modifier.weight(1f), KeyboardType.Decimal)
             AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
         }
+        }
         Button(
             onClick = { onSave(memo, date, goj, bill.toDoubleOrNull() ?: 0.0, note, joma.toDoubleOrNull() ?: 0.0) },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(46.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal)
         ) {
             Text("সেভ করুন")
@@ -108,7 +129,7 @@ private fun BokeyoaMiniForm(
 }
 
 @Composable
-private fun JomaMiniForm(
+private fun ColumnScope.JomaMiniForm(
     onSave: (memo: String, date: String, joma: Double, note: String) -> Unit
 ) {
     var memo by remember { mutableStateOf("") }
@@ -119,10 +140,17 @@ private fun JomaMiniForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .weight(1f, fill = false)
             .padding(top = 10.dp)
             .background(Color(0xFFF7F5EE), RoundedCornerShape(10.dp))
             .padding(10.dp)
     ) {
+        // ফিল্ডগুলো স্ক্রলযোগ্য অংশে; সেভ বাটন এর বাইরে, নিচে আটকানো — কিবোর্ড উঠলেও দেখা যায়
+        Column(
+            modifier = Modifier
+                .weight(1f, fill = false)
+                .verticalScroll(rememberScrollState())
+        ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
@@ -131,9 +159,10 @@ private fun JomaMiniForm(
             AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
             AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
         }
+        }
         Button(
             onClick = { onSave(memo, date, joma.toDoubleOrNull() ?: 0.0, note) },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(46.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal)
         ) {
             Text("সেভ করুন")
