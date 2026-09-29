@@ -138,7 +138,8 @@ fun HomeScreen(
                     subtitle = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_CUSTOMER) },
                     art = { CustomerArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
             item {
@@ -147,7 +148,8 @@ fun HomeScreen(
                     subtitle = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_CUSTOMER) },
                     art = { CustomerIrregularArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
             item {
@@ -156,7 +158,8 @@ fun HomeScreen(
                     subtitle = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_SUPPLIER) },
                     art = { SupplierTruckArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
             item {
@@ -165,7 +168,8 @@ fun HomeScreen(
                     subtitle = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_SUPPLIER) },
                     art = { SupplierIrregularArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
             item {
@@ -173,7 +177,8 @@ fun HomeScreen(
                     title = "Party",
                     onClick = onPartyClick,
                     art = { PartyArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
             item {
@@ -181,7 +186,8 @@ fun HomeScreen(
                     title = "Database",
                     onClick = onDbConnectClick,
                     art = { DatabaseArt() },
-                    labelColor = AppColors.TextPrimary
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
                 )
             }
         }
