@@ -52,7 +52,7 @@ fun NotificationPanel(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppColors.HeaderTeal)
     ) {
         Row(
             modifier = Modifier
@@ -60,15 +60,14 @@ fun NotificationPanel(
                 .background(
                     androidx.compose.ui.graphics.Brush.verticalGradient(
                         listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
-                    ),
-                    RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
+                    )
                 )
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 30.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("🔔 নোটিফিকেশন", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text("নোটিফিকেশন", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "সব মুছো",
@@ -79,30 +78,29 @@ fun NotificationPanel(
                         .clickable { viewModel.clearAll() }
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                 )
-                Text(
-                    text = "✕",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(onClick = onClose)
-                        .padding(8.dp)
-                )
             }
         }
 
-        if (notifications.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("কোনো নোটিফিকেশন নেই", color = Color(0xFF8A8578), fontSize = 13.sp)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(notifications, key = { it.id }) { notif ->
-                    NotifRow(notif)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color.White)
+        ) {
+            if (notifications.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("কোনো নোটিফিকেশন নেই", color = Color(0xFF8A8578), fontSize = 13.sp)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(notifications, key = { it.id }) { notif ->
+                        NotifRow(notif)
+                    }
                 }
             }
         }
