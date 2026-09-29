@@ -154,6 +154,15 @@ fun HomeScreen(
             }
             item {
                 MiniArtCard(
+                    title = "Party",
+                    onClick = onPartyClick,
+                    art = { PartyArt() },
+                    labelColor = AppColors.TextPrimary,
+                    cardHeight = 172.dp
+                )
+            }
+            item {
+                MiniArtCard(
                     title = "Regular Suppliers",
                     subtitle = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_SUPPLIER) },
@@ -168,15 +177,6 @@ fun HomeScreen(
                     subtitle = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_SUPPLIER) },
                     art = { SupplierIrregularArt() },
-                    labelColor = AppColors.TextPrimary,
-                    cardHeight = 172.dp
-                )
-            }
-            item {
-                MiniArtCard(
-                    title = "Party",
-                    onClick = onPartyClick,
-                    art = { PartyArt() },
                     labelColor = AppColors.TextPrimary,
                     cardHeight = 172.dp
                 )
