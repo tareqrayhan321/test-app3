@@ -15,6 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -110,9 +115,9 @@ fun NotificationPanel(
 @Composable
 private fun NotifRow(notif: Notification) {
     val icon = when (notif.type) {
-        "success" -> androidx.compose.material.icons.Icons.Filled.CheckCircle
-        "error" -> androidx.compose.material.icons.Icons.Filled.Warning
-        else -> androidx.compose.material.icons.Icons.Filled.Cloud
+        "success" -> Icons.Filled.CheckCircle
+        "error" -> Icons.Filled.Warning
+        else -> Icons.Filled.Cloud
     }
     val iconTint = when (notif.type) {
         "success" -> Color(0xFF1F9D55)
@@ -140,7 +145,7 @@ private fun NotifRow(notif: Notification) {
                 .background(iconBg),
             contentAlignment = Alignment.Center
         ) {
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = iconTint,
@@ -154,7 +159,7 @@ private fun NotifRow(notif: Notification) {
     }
 }
 
-/** ওয়েব অ্যাপের _notifTimeText() এর সমতুল্য — "এইমাত্র" / "X মিনিট আগে" / "X ঘণ্টা আগে" / তারিখ */
+/** ওয়েব অ্যাপের _notifTimeText() এর সমতুল্য — "এইমাত্র" / "X মিনিট আগে" / "X ঘণ্টা আগে" / তারিখ। */
 private fun formatNotifTime(ts: Long): String {
     val diff = System.currentTimeMillis() - ts
     val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
