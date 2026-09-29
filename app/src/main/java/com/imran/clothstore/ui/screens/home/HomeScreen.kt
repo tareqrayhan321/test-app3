@@ -36,7 +36,8 @@ import com.imran.clothstore.ui.components.CalendarStripCard
 import com.imran.clothstore.ui.components.CustomerArt
 import com.imran.clothstore.ui.components.CustomerIrregularArt
 import com.imran.clothstore.ui.components.FabricArt
-import com.imran.clothstore.ui.components.HomeCard
+import com.imran.clothstore.ui.components.DatabaseArt
+import com.imran.clothstore.ui.components.PartyArt
 import com.imran.clothstore.ui.components.MiniArtCard
 import com.imran.clothstore.ui.components.PLTrendsArt
 import com.imran.clothstore.ui.components.ReportArt
@@ -47,10 +48,10 @@ import com.imran.clothstore.ui.theme.AppColors
 
 /**
  * হোম ট্যাব — টপবার (নিচে গোলাকার কার্ভ) → হেডারের উপর আংশিক বসানো ৩টা KPI কার্ড (কাপড় ক্রয় হিসাব /
- * P&L Trends / সাপ্তাহিক রিপোর্ট) → ক্যালেন্ডার স্ট্রিপ → ৪টা হোম কার্ড (রেগুলার/ইর-রেগুলার
- * কাস্টমার, রেগুলার/ইর-রেগুলার মহাজন), ২×২ গ্রিডে।
+ * P&L Trends / সাপ্তাহিক রিপোর্ট) → ক্যালেন্ডার স্ট্রিপ → ৬টা হোম কার্ড (রেগুলার/ইর-রেগুলার
+ * কাস্টমার, রেগুলার/ইর-রেগুলার মহাজন, পার্টি, ডাটাবেইজ), ৩×২ গ্রিডে — KPI কার্ডের সমান সাইজ।
  *
- * ডাটাবেইজ সংযোগ ও পার্টি — সাইড মেনুতে সরানো হয়েছে (SideMenu.kt)।
+ * পার্টি ও ডাটাবেইজ সংযোগ — সাইড মেনু থেকে হোম কার্ডে আনা হয়েছে।
  * সাপ্তাহিক তথ্য হালনাগাদের এন্ট্রি পয়েন্ট Dashboard ট্যাবের ব্যানারে (DashboardScreen.kt)।
  */
 @Composable
@@ -61,6 +62,8 @@ fun HomeScreen(
     onAggregateReportClick: () -> Unit,
     onPLTrendsClick: () -> Unit,
     onFabricClick: () -> Unit,
+    onPartyClick: () -> Unit,
+    onDbConnectClick: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
     notifViewModel: NotificationViewModel = viewModel()
 ) {
@@ -115,7 +118,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(overlap + 8.dp))
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(3),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
@@ -125,40 +128,60 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // ── ক্যালেন্ডার স্ট্রিপ (বাংলা/হিজরি/ইংরেজি তারিখ + সাপ্তাহিক দিন) ──
-            item(span = { GridItemSpan(2) }) {
+            item(span = { GridItemSpan(3) }) {
                 CalendarStripCard()
             }
 
             item {
-                HomeCard(
+                MiniArtCard(
                     title = "Regular Customers",
-                    statText = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER, summaries),
+                    subtitle = viewModel.formatSummary(EntryCategory.REGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_CUSTOMER) },
-                    art = { CustomerArt() }
+                    art = { CustomerArt() },
+                    labelColor = AppColors.TextPrimary
                 )
             }
             item {
-                HomeCard(
+                MiniArtCard(
                     title = "Irregular Customers",
-                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER, summaries),
+                    subtitle = viewModel.formatSummary(EntryCategory.IRREGULAR_CUSTOMER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_CUSTOMER) },
-                    art = { CustomerIrregularArt() }
+                    art = { CustomerIrregularArt() },
+                    labelColor = AppColors.TextPrimary
                 )
             }
             item {
-                HomeCard(
+                MiniArtCard(
                     title = "Regular Suppliers",
-                    statText = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER, summaries),
+                    subtitle = viewModel.formatSummary(EntryCategory.REGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.REGULAR_SUPPLIER) },
-                    art = { SupplierTruckArt() }
+                    art = { SupplierTruckArt() },
+                    labelColor = AppColors.TextPrimary
                 )
             }
             item {
-                HomeCard(
+                MiniArtCard(
                     title = "Irregular Suppliers",
-                    statText = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER, summaries),
+                    subtitle = viewModel.formatSummary(EntryCategory.IRREGULAR_SUPPLIER, summaries),
                     onClick = { onCardClick(EntryCategory.IRREGULAR_SUPPLIER) },
-                    art = { SupplierIrregularArt() }
+                    art = { SupplierIrregularArt() },
+                    labelColor = AppColors.TextPrimary
+                )
+            }
+            item {
+                MiniArtCard(
+                    title = "Party",
+                    onClick = onPartyClick,
+                    art = { PartyArt() },
+                    labelColor = AppColors.TextPrimary
+                )
+            }
+            item {
+                MiniArtCard(
+                    title = "Database",
+                    onClick = onDbConnectClick,
+                    art = { DatabaseArt() },
+                    labelColor = AppColors.TextPrimary
                 )
             }
         }
@@ -187,7 +210,9 @@ fun HomeScreenPreview() {
             onMenuClick = {},
             onAggregateReportClick = {},
             onPLTrendsClick = {},
-            onFabricClick = {}
+            onFabricClick = {},
+            onPartyClick = {},
+            onDbConnectClick = {}
         )
     }
 }
