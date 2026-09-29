@@ -6,6 +6,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,9 +26,9 @@ import com.imran.clothstore.util.formatTaka
 import com.imran.clothstore.util.toBengaliDigits
 
 /**
- * ওয়েব অ্যাপের .fv-excel টেবিলের সমতুল্য — রেফারেন্স স্ক্রিনশট অনুযায়ী: গাঢ় সবুজ হেডার সারি (সাদা
- * বোল্ড টেক্সট), পাওনা-সারি গোলাপি-হালকা, জমা-সারি ধূসর-সবুজ, টাকা "৳১,১৪,৮৫৩" ফরম্যাটে।
- * কলাম: তারিখ | ম্যামো | পাওনা/প্রাপ্য | জমা | মোট বাকি | গজ | মন্তব্য — অনুভূমিক স্ক্রলযোগ্য।
+ * ওয়েব অ্যাপের .fv-excel টেবিলের সমতুল্য — রেফারেন্স স্ক্রিনশট অনুযায়ী: গাঢ় সবুজ হেডার (সাদা
+ * বোল্ড টেক্সট), পাওনা-সারি গোলাপি-হালকা, জমা-সারি ধূসর-সবুজ, টাকা "৳১,১৪,৮৫৩" রঙে।
+ * কলাম: তারিখ | ম্যামো | পাওনা/প্রাপ্য | জমা | মোট বাকি | গজ | মন্তব্য — অনুভূমিক স্ক্রল।
  */
 @Composable
 fun TransactionTable(rows: List<TxnRow>) {
@@ -122,8 +123,9 @@ private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, 
     }
 }
 
-/** "2026-09-23" জাতীয় ISO তারিখকে "২৩/০৯/২০২৬" (দিন/মাস দুই অঙ্কে, বাংলা অঙ্কে) ফরম্যাটে দেখায় —
- *  রেফারেন্স স্ক্রিনশটের টেবিল অনুযায়ী। পার্স ব্যর্থ হলে মূল স্ট্রিং বাংলা অঙ্কে ফেরত দেয়। */
+/** "2026-09-23" জাতীয় ISO তারিখকে "২৩/০৯/২০২৬" (দিন/মাস দুই অঙ্কে, বাংলা অঙ্কে) ফরম্যাটে রূপান্তর।
+ *  রেফারেন্স স্ক্রিনশটের টেবিল অনুযায়ী। পার্স ব্যর্থ হলে মূল স্ট্রিং বা "—" রিটার্ন।
+ */
 private fun formatDateShort(date: String): String {
     if (date.isBlank()) return "—"
     return try {
