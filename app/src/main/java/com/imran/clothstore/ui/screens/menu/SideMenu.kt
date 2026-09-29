@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,7 +29,7 @@ import com.imran.clothstore.ui.theme.AppColors
 /**
  * ওয়েব অ্যাপের side-menu (sideMenu/menuOverlay) এর Kotlin/Compose সংস্করণ।
  * মূল ওয়েব অ্যাপে side-menu-body সম্পূর্ণ খালি ছিল (ভবিষ্যতের সম্প্রসারণের জন্য রাখা),
- * তাই এখানে কাঠামো অভিন্ন রেখে ব্যবহারিক শর্টকাট (হোম, পার্টি লেজার, ডাটাবেইজ সংযোগ) যোগ করা হয়েছে।
+ * তাই এখানে কাঠামো অভিন্ন রেখে ব্যবহারিক শর্টকাট (হোম, পার্টি লেজার, ডাটাবেইজ) রাখা হয়েছে।
  */
 @Composable
 fun SideMenu(
@@ -63,7 +66,7 @@ fun SideMenu(
                 .background(Color.White)
                 .padding(12.dp)
         ) {
-            MenuItem(androidx.compose.material.icons.Icons.Filled.Home, "হোম", onNavigateHome)
+            MenuItem(Icons.Filled.Home, "হোম", onNavigateHome)
         }
     }
 }
@@ -78,7 +81,7 @@ private fun MenuItem(icon: androidx.compose.ui.graphics.vector.ImageVector, labe
             .padding(vertical = 12.dp, horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.Icon(
+        Icon(
             imageVector = icon,
             contentDescription = null,
             tint = Color(0xFF2A2418),
