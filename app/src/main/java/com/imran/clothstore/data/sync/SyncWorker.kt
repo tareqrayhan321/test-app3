@@ -71,6 +71,13 @@ class SyncWorker(
             if (hasPending) {
                 repository.pushToRemote(merged)
             }
+            // নেটওয়ার্কে থাকাকালীন ইউজার নতুন কিছু এডিট করে থাকলে (updatedAt বাদে হুবহু তুলনা),
+            // পুরনো merged দিয়ে সেটা ওভাররাইট করা হয় না এবং pendingSync-ও true-ই থাকে।
+            // ওই এডিটের নিজস্ব sync আগেই শিডিউল হয়ে আছে, সেটাই বাকিটা সামলাবে।
+            val latestLocal = local.getOnce()
+            if (latestLocal.copy(updatedAt = 0L) != localPayload.copy(updatedAt = 0L)) {
+                return Result.success()
+            }
             // pull-এর ফলাফল (অন্য ডিভাইসের পরিবর্তনসহ) Room-এ প্রতিফলিত করা, pendingSync ক্লিয়ার করা
             local.save(merged, markPendingSync = false)
 
@@ -106,8 +113,10 @@ class SyncWorker(
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
+            // ২ সেকেন্ড debounce — REPLACE নীতির সাথে পরপর কয়েকটা সেভে শুধু শেষটার পরেই একবার sync হয়
             val request = OneTimeWorkRequestBuilder<SyncWorker>()
                 .setConstraints(constraints)
+                .setInitialDelay(2, TimeUnit.SECONDS)
                 .build()
             WorkManager.getInstance(context).enqueueUniqueWork(
                 ONE_TIME_WORK_NAME,
