@@ -125,14 +125,21 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHANNEL_ID: "@myapkLibraries"
         run: |
           test -n "$TELEGRAM_BOT_TOKEN" || { echo "Missing repository secret: TELEGRAM_BOT_TOKEN" >&2; exit 1; }
           test -n "$TELEGRAM_CHAT_ID" || { echo "Missing repository secret: TELEGRAM_CHAT_ID" >&2; exit 1; }
+          test -n "$TELEGRAM_CHANNEL_ID" || { echo "Missing Telegram channel username" >&2; exit 1; }
           APK="dist/clothstore-${GITHUB_REF_NAME}.apk"
           RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
           curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
             -F "chat_id=${TELEGRAM_CHAT_ID}" \
+            -F "document=@${APK}" \
+            -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
+          curl --fail --silent --show-error --retry 3 \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+            -F "chat_id=${TELEGRAM_CHANNEL_ID}" \
             -F "document=@${APK}" \
             -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
 
