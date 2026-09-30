@@ -131,6 +131,9 @@ jobs:
           test -n "$TELEGRAM_CHAT_ID" || { echo "Missing repository secret: TELEGRAM_CHAT_ID" >&2; exit 1; }
           test -n "$TELEGRAM_CHANNEL_ID" || { echo "Missing Telegram channel username" >&2; exit 1; }
           APK="dist/clothstore-${GITHUB_REF_NAME}.apk"
+          test -s "$APK" || { echo "Release APK is missing or empty: $APK" >&2; exit 1; }
+          CHANNEL_APK="$RUNNER_TEMP/clothstore-channel.apk"
+          cp "$APK" "$CHANNEL_APK"
           RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
           curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
@@ -140,7 +143,7 @@ jobs:
           curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
             -F "chat_id=${TELEGRAM_CHANNEL_ID}" \
-            -F "document=@${APK}" \
+            -F "document=@${CHANNEL_APK}" \
             -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
 
       - name: Remove temporary keystore
