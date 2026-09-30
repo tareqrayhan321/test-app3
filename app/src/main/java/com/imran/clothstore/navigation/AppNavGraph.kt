@@ -60,6 +60,8 @@ fun AppNavGraph(
     val reportsViewModel: WeeklyReportsViewModel = viewModel()
     val notifViewModel: NotificationViewModel = viewModel()
     val homeViewModel: com.imran.clothstore.ui.screens.home.HomeViewModel = viewModel()
+    // পার্টি লেজারের ViewModel এখানে তৈরি — হোমের মতোই আগে থেকে ডাটা লোড হয়ে থাকে, খুলতেই তালিকা হাজির
+    val debtorsViewModel: com.imran.clothstore.ui.screens.debtors.DebtorsListViewModel = viewModel()
 
     // ডিফল্ট NavHost ট্রানজিশন ~৭০০ms ফেড — প্রতিটা ট্যাপ ধীর মনে হতো, তাই তাৎক্ষণিক করা হলো
     NavHost(
@@ -153,7 +155,8 @@ fun AppNavGraph(
 
         composable(Routes.DEBTORS_LIST) {
             DebtorsListScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                viewModel = debtorsViewModel
             )
         }
 
