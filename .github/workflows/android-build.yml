@@ -139,14 +139,14 @@ jobs:
             -F "chat_id=${TELEGRAM_CHAT_ID}" \
             -F "document=@${APK}" \
             -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}" \
-            -o "$PERSONAL_RESPONSE_FILE"
-          TELEGRAM_FILE_ID=$(jq -r '.result.document.file_id // empty' "$PERSONAL_RESPONSE_FILE")
-          test -n "$TELEGRAM_FILE_ID" || { echo "Telegram did not return a file_id" >&2; exit 1; }
+            | tee "$PERSONAL_RESPONSE_FILE"
+          TELEGRAM_MESSAGE_ID=$(jq -r '.result.message_id // empty' "$PERSONAL_RESPONSE_FILE")
+          test -n "$TELEGRAM_MESSAGE_ID" || { echo "Telegram did not return a message_id" >&2; exit 1; }
           curl --fail --silent --show-error --retry 3 \
-            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/copyMessage" \
             -F "chat_id=${TELEGRAM_CHANNEL_ID}" \
-            --form-string "document=${TELEGRAM_FILE_ID}" \
-            -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
+            -F "from_chat_id=${TELEGRAM_CHAT_ID}" \
+            -F "message_id=${TELEGRAM_MESSAGE_ID}"
 
       - name: Remove temporary keystore
         if: always()
