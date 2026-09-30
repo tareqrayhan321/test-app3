@@ -8,11 +8,13 @@ import com.imran.clothstore.data.backup.toBackupEntry
 import com.imran.clothstore.data.model.Entry
 import com.imran.clothstore.data.model.EntryCategory
 import com.imran.clothstore.data.model.HistoryItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -82,7 +84,10 @@ class DebtorsListViewModel(
                     it.entry.mob.lowercase().contains(q)
             }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }
+        // ভারী flatMap/filter Main থ্রেডের বাইরে; Eagerly — স্ক্রিন খোলার আগেই তালিকা তৈরি থাকে
+        .flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     /** মহাজন (৩+৪) ক্যাটাগরির মোট পাওনা */
     val totalPawona: StateFlow<Double> = filteredRows
@@ -91,7 +96,7 @@ class DebtorsListViewModel(
                 it.category == EntryCategory.REGULAR_SUPPLIER || it.category == EntryCategory.IRREGULAR_SUPPLIER
             }.sumOf { it.entry.baki }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
 
     /** কাস্টমার (১+২) ক্যাটাগরির মোট বকেয়া */
     val totalBokea: StateFlow<Double> = filteredRows
@@ -100,7 +105,7 @@ class DebtorsListViewModel(
                 it.category == EntryCategory.REGULAR_CUSTOMER || it.category == EntryCategory.IRREGULAR_CUSTOMER
             }.sumOf { it.entry.baki }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
 
     fun onSearchChange(query: String) {
         _searchQuery.value = query
@@ -108,6 +113,12 @@ class DebtorsListViewModel(
 
     fun onTabChange(tab: DlTab) {
         _activeTab.value = tab
+    }
+
+    /** স্ক্রিন থেকে বেরোলে সার্চ/ট্যাব আগের মতো ডিফল্টে ফেরে (ViewModel এখন অ্যাপ-স্কোপে থাকে) */
+    fun resetFilters() {
+        _searchQuery.value = ""
+        _activeTab.value = DlTab.All
     }
 
     /** dlJomaSave() এর সমতুল্য — নির্দিষ্ট এন্ট্রিতে দ্রুত জমা যোগ করে */

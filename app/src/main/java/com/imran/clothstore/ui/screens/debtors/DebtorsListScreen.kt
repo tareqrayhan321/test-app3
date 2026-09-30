@@ -26,6 +26,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,8 @@ fun DebtorsListScreen(
     viewModel: DebtorsListViewModel = viewModel()
 ) {
     BackHandler(onBack = onBack)
+    // ViewModel অ্যাপ-স্কোপে থাকে (তালিকা আগে থেকেই তৈরি) — তাই বেরোনোর সময় ফিল্টার রিসেট
+    DisposableEffect(Unit) { onDispose { viewModel.resetFilters() } }
     val rows by viewModel.filteredRows.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
     val activeTab by viewModel.activeTab.collectAsState()
@@ -175,19 +178,22 @@ fun DebtorsListScreen(
                 fun widthOf(text: String, style: TextStyle): Int =
                     textMeasurer.measure(text = text, style = style, softWrap = false).size.width
 
+                // সব রো মাপার বদলে প্রতি কলামে সবচেয়ে লম্বা কয়েকটা লেখা মাপা হয় — ফল একই, খরচ অনেক কম
+                fun longest(texts: List<String>): List<String> = texts.sortedByDescending { it.length }.take(6)
+
                 val nameColWidth = remember(rows, nameStyle, density, capWidth) {
-                    val maxPx = rows.maxOfOrNull { widthOf(it.entry.name.ifBlank { "—" }, nameStyle) } ?: 0
+                    val maxPx = longest(rows.map { it.entry.name.ifBlank { "—" } }).maxOfOrNull { widthOf(it, nameStyle) } ?: 0
                     minOf(capWidth, maxOf(70.dp, with(density) { maxPx.toDp() } + 14.dp))
                 }
                 val moneyColWidth = remember(rows, moneyStyle, headStyle, density) {
                     val maxPx = maxOf(
-                        rows.maxOfOrNull { widthOf("৳${it.entry.baki.toLong()}", moneyStyle) } ?: 0,
+                        longest(rows.map { "৳${it.entry.baki.toLong()}" }).maxOfOrNull { widthOf(it, moneyStyle) } ?: 0,
                         widthOf("পাওনা/বকেয়া", headStyle)
                     )
                     with(density) { maxPx.toDp() } + 14.dp
                 }
                 val addrColWidth = remember(rows, addrStyle, density, capWidth) {
-                    val maxPx = rows.maxOfOrNull { widthOf(it.entry.addr.ifBlank { "—" }, addrStyle) } ?: 0
+                    val maxPx = longest(rows.map { it.entry.addr.ifBlank { "—" } }).maxOfOrNull { widthOf(it, addrStyle) } ?: 0
                     minOf(capWidth, maxOf(50.dp, with(density) { maxPx.toDp() } + 14.dp))
                 }
 
