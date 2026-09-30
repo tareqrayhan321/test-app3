@@ -34,10 +34,13 @@ import com.imran.clothstore.util.toBengaliDigits
 fun TransactionTable(rows: List<TxnRow>) {
     val colWidths = listOf(96.dp, 72.dp, 116.dp, 100.dp, 108.dp, 76.dp, 200.dp)
     val headers = listOf("তারিখ", "ম্যামো", "পাওনা/প্রাপ্য", "জমা", "মোট বাকি", "গজ", "মন্তব্য")
+    // পার্টি লেজারের এক্সেল টেবিলের সাথে হুবহু এক ভিজুয়াল: সাদা / হালকা-বেজ বিকল্প রো, একই গ্রিড ও হেডার রঙ
     val headerBg = Color(0xFF1E3A32)
-    val pawnaBg = Color(0xFFF2E6E4)
-    val jomaBg = Color(0xFFECEEEA)
+    val rowEven = Color.White
+    val rowOdd = Color(0xFFF7F5EF)
     val grid = Color(0xFFCFCBC0)
+    val redNum = Color(0xFFD9452B)
+    val greenNum = Color(0xFF2BB673)
 
     Column(modifier = Modifier.horizontalScroll(rememberScrollState())) {
         Row(modifier = Modifier.background(headerBg).height(HEADER_H)) {
@@ -72,14 +75,15 @@ fun TransactionTable(rows: List<TxnRow>) {
             )
         }
 
-        rows.forEach { row ->
-            val bg = if (row.type == TxnType.BILL_OR_PAWNA) pawnaBg else jomaBg
+        rows.forEachIndexed { index, row ->
+            val bg = if (index % 2 == 0) rowEven else rowOdd
             Row(modifier = Modifier.background(bg).height(ROW_H)) {
                 Cell(formatDateShort(row.date), colWidths[0], grid, TextAlign.Center)
                 Cell(row.memo.ifBlank { "—" }.toBengaliDigits(), colWidths[1], grid, TextAlign.Center, bold = row.memo.isNotBlank())
                 Cell(
                     if (row.type == TxnType.BILL_OR_PAWNA) formatTaka(row.amount) else "—",
-                    colWidths[2], grid, TextAlign.Center
+                    colWidths[2], grid, TextAlign.Center,
+                    color = if (row.type == TxnType.BILL_OR_PAWNA) redNum else Color(0xFF141413)
                 )
                 Cell(
                     when {
@@ -87,9 +91,13 @@ fun TransactionTable(rows: List<TxnRow>) {
                         row.type == TxnType.JOMA -> formatTaka(row.amount)
                         else -> "—"
                     },
-                    colWidths[3], grid, TextAlign.Center, bold = true
+                    colWidths[3], grid, TextAlign.Center, bold = true,
+                    color = if (row.mergedJomaAmount != null || row.type == TxnType.JOMA) greenNum else Color(0xFF141413)
                 )
-                Cell(formatTaka(row.runningBaki), colWidths[4], grid, TextAlign.Center, bold = true)
+                Cell(
+                    formatTaka(row.runningBaki), colWidths[4], grid, TextAlign.Center, bold = true,
+                    color = if (row.runningBaki == 0.0) greenNum else redNum
+                )
                 Cell(row.goj.ifBlank { "—" }.toBengaliDigits(), colWidths[5], grid, TextAlign.Center)
                 Cell(row.note.ifBlank { "" }, colWidths[6], grid, TextAlign.Start)
             }
@@ -101,7 +109,7 @@ private val HEADER_H = 34.dp
 private val ROW_H = 32.dp
 
 @Composable
-private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, align: TextAlign, bold: Boolean = false) {
+private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, align: TextAlign, bold: Boolean = false, color: Color = Color(0xFF141413)) {
     Box(
         modifier = Modifier
             .width(width)
@@ -114,7 +122,7 @@ private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, 
             modifier = Modifier.padding(horizontal = 6.dp),
             fontSize = 12.sp,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
-            color = Color(0xFF141413),
+            color = color,
             textAlign = align,
             maxLines = 1,
             softWrap = false,
