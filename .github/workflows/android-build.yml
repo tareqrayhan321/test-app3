@@ -142,11 +142,17 @@ jobs:
             | tee "$PERSONAL_RESPONSE_FILE"
           TELEGRAM_MESSAGE_ID=$(jq -r '.result.message_id // empty' "$PERSONAL_RESPONSE_FILE")
           test -n "$TELEGRAM_MESSAGE_ID" || { echo "Telegram did not return a message_id" >&2; exit 1; }
+          CHANNEL_RESPONSE_FILE="$RUNNER_TEMP/telegram-channel-response.json"
           curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/copyMessage" \
             --form-string "chat_id=${TELEGRAM_CHANNEL_ID}" \
             -F "from_chat_id=${TELEGRAM_CHAT_ID}" \
-            -F "message_id=${TELEGRAM_MESSAGE_ID}"
+            -F "message_id=${TELEGRAM_MESSAGE_ID}" \
+            -o "$CHANNEL_RESPONSE_FILE"
+          CHANNEL_MESSAGE_ID=$(jq -r '.result.message_id // empty' "$CHANNEL_RESPONSE_FILE")
+          test -n "$CHANNEL_MESSAGE_ID" || { echo "Telegram did not return a channel message_id" >&2; cat "$CHANNEL_RESPONSE_FILE"; exit 1; }
+          printf '\nTelegram channel message ID: %s\n' "$CHANNEL_MESSAGE_ID" >> dist/release-notes.md
+          gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes-file dist/release-notes.md
 
       - name: Remove temporary keystore
         if: always()
