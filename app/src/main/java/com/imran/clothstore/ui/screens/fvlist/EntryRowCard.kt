@@ -84,7 +84,7 @@ fun EntryRowCard(
                 } else {
                     Text(
                         text = entry.name.trim().take(2).ifEmpty { "?" },
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.TextPrimary
                     )
@@ -98,21 +98,21 @@ fun EntryRowCard(
             ) {
                 Text(
                     text = entry.name.ifBlank { "নাম নেই" },
-                    fontSize = 17.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.TextPrimary
                 )
                 if (entry.addr.isNotBlank()) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 6.dp)) {
                         Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = Color(0xFF6C6A64), modifier = Modifier.size(18.dp))
-                        Text(entry.addr, fontSize = 14.sp, color = AppColors.TextPrimary, modifier = Modifier.padding(start = 6.dp))
+                        Text(entry.addr, fontSize = 12.sp, color = AppColors.TextPrimary, modifier = Modifier.padding(start = 6.dp))
                     }
                 }
                 if (entry.mob.isNotBlank()) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 6.dp)) {
                         Icon(Icons.Outlined.Call, contentDescription = null, tint = Color(0xFF6C6A64), modifier = Modifier.size(18.dp))
                         // ফোন নম্বর ইংরেজি অঙ্কেই থাকে (ওয়েব অ্যাপের PHONE_RE আচরণ)
-                        Text(entry.mob, fontSize = 14.sp, color = AppColors.TextPrimary, modifier = Modifier.padding(start = 6.dp))
+                        Text(entry.mob, fontSize = 12.sp, color = AppColors.TextPrimary, modifier = Modifier.padding(start = 6.dp))
                     }
                 }
             }
@@ -137,7 +137,7 @@ fun EntryRowCard(
                 }
                 Text(
                     text = formatTaka(entry.baki),
-                    fontSize = 15.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppColors.TextPrimary,
                     modifier = Modifier.padding(top = 14.dp)

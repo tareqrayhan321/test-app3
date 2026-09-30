@@ -86,7 +86,7 @@ fun DetailScreen(
                 } else {
                     Text(
                         text = entry.name.trim().take(1).ifEmpty { "?" },
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.TextPrimary
                     )
@@ -100,7 +100,7 @@ fun DetailScreen(
                 Text(
                     text = entry.name.ifBlank { "—" },
                     color = AppColors.TextPrimary,
-                    fontSize = 21.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 val metaParts = listOf(entry.addr, entry.mob).filter { it.isNotBlank() }
@@ -108,7 +108,7 @@ fun DetailScreen(
                     Text(
                         text = metaParts.joinToString(" · "),
                         color = Color(0xFF4A4740),
-                        fontSize = 15.sp
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -139,12 +139,12 @@ fun DetailScreen(
         ) {
             Text(
                 text = if (category.isCustomerType) "বর্তমান পাওনা/প্রাপ্য" else "বর্তমান বকেয়া",
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 color = AppColors.TextPrimary
             )
             Text(
                 text = formatTaka(entry.baki),
-                fontSize = 22.sp,
+                fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
                 color = AppColors.TextPrimary,
                 modifier = Modifier.padding(start = 12.dp)
@@ -168,7 +168,7 @@ fun DetailScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F9D55))
             ) {
-                Text("💰 জমা এন্ট্রি", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
+                Text("💰 জমা এন্ট্রি", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
             }
             Button(
                 onClick = { formKind = "bokeyoa" },
@@ -179,7 +179,7 @@ fun DetailScreen(
             ) {
                 Text(
                     if (category.isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
-                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
+                    fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
                 )
             }
         }

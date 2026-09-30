@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.imran.clothstore.util.formatTaka
@@ -44,6 +45,7 @@ import com.imran.clothstore.ui.theme.AppColors
  * হেডার (আইকন + টাইটেল + সাবটাইটেল + নতুন এন্ট্রি বাটন) → সার্চ → লিস্ট বডি।
  * হেডারে ব্যাক আইকন নেই — ফোনের সিস্টেম ব্যাক জেসচার/বাটন দিয়ে ফেরা যায় (BackHandler)।
  */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun FvListScreen(
     category: EntryCategory,
@@ -76,7 +78,7 @@ fun FvListScreen(
                     )
                 )
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 22.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 14.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -88,13 +90,13 @@ fun FvListScreen(
                         imageVector = Icons.Outlined.Groups,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(26.dp)
                     )
-                    Column(modifier = Modifier.padding(start = 14.dp)) {
+                    Column(modifier = Modifier.padding(start = 12.dp)) {
                         Text(
                             text = category.titleBn,
                             color = Color.White,
-                            fontSize = 21.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
@@ -102,28 +104,58 @@ fun FvListScreen(
                                 "${totalCount.toBengaliDigits()} জন · মোট বাকি ${formatTaka(totalBaki)}"
                             else "কোনো এন্ট্রি নেই",
                             color = Color.White.copy(alpha = 0.75f),
-                            fontSize = 13.sp
+                            fontSize = 12.sp
                         )
                     }
                 }
             }
 
-            OutlinedTextField(
+            // সার্চ বক্স — কম হাইট (42dp), চারকোনা-রাউন্ডেড (12dp)
+            val searchInteraction = androidx.compose.runtime.remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            androidx.compose.foundation.text.BasicTextField(
                 value = query,
                 onValueChange = viewModel::onSearchChange,
-                placeholder = { Text("নাম বা ঠিকানা খুঁজুন...", color = Color(0xFF8E8B82)) },
-                leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color(0xFF6C6A64)) },
                 singleLine = true,
-                shape = CircleShape,
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp, color = Color(0xFF141413)),
+                cursorBrush = androidx.compose.ui.graphics.SolidColor(AppColors.HeaderTeal),
+                interactionSource = searchInteraction,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = Color(0xFFD9D2C0),
-                    unfocusedBorderColor = Color(0xFFE2D9C4)
-                )
+                    .padding(top = 12.dp)
+                    .height(42.dp),
+                decorationBox = { innerTextField ->
+                    androidx.compose.material3.OutlinedTextFieldDefaults.DecorationBox(
+                        value = query,
+                        innerTextField = innerTextField,
+                        enabled = true,
+                        singleLine = true,
+                        visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
+                        interactionSource = searchInteraction,
+                        placeholder = { Text("নাম বা ঠিকানা খুঁজুন...", color = Color(0xFF8E8B82), fontSize = 13.sp) },
+                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = Color(0xFF6C6A64), modifier = Modifier.size(20.dp)) },
+                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedBorderColor = Color(0xFFD9D2C0),
+                            unfocusedBorderColor = Color(0xFFE2D9C4)
+                        ),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        container = {
+                            androidx.compose.material3.OutlinedTextFieldDefaults.ContainerBox(
+                                enabled = true,
+                                isError = false,
+                                interactionSource = searchInteraction,
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                    focusedBorderColor = Color(0xFFD9D2C0),
+                                    unfocusedBorderColor = Color(0xFFE2D9C4)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+                    )
+                }
             )
         }
 

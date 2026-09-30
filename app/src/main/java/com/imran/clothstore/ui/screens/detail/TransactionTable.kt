@@ -55,7 +55,7 @@ fun TransactionTable(rows: List<TxnRow>) {
                     Text(
                         text = h,
                         modifier = Modifier.padding(horizontal = 6.dp),
-                        fontSize = 12.sp,
+                        fontSize = 10.5.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         textAlign = TextAlign.Center,
@@ -70,7 +70,7 @@ fun TransactionTable(rows: List<TxnRow>) {
             Text(
                 text = "কোনো লেনদেন নেই",
                 modifier = Modifier.padding(16.dp),
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = Color(0xFF9A96AD)
             )
         }
@@ -120,7 +120,7 @@ private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, grid: Color, 
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 6.dp),
-            fontSize = 12.sp,
+            fontSize = 10.5.sp,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
             color = color,
             textAlign = align,
