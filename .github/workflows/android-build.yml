@@ -133,17 +133,19 @@ jobs:
           APK="dist/clothstore-${GITHUB_REF_NAME}.apk"
           test -s "$APK" || { echo "Release APK is missing or empty: $APK" >&2; exit 1; }
           RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
-          PERSONAL_RESPONSE=$(curl --fail --silent --show-error --retry 3 \
+          PERSONAL_RESPONSE_FILE="$RUNNER_TEMP/telegram-personal-response.json"
+          curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
             -F "chat_id=${TELEGRAM_CHAT_ID}" \
             -F "document=@${APK}" \
-            -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}")
-          TELEGRAM_FILE_ID=$(printf '%s' "$PERSONAL_RESPONSE" | jq -r '.result.document.file_id // empty')
+            -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}" \
+            -o "$PERSONAL_RESPONSE_FILE"
+          TELEGRAM_FILE_ID=$(jq -r '.result.document.file_id // empty' "$PERSONAL_RESPONSE_FILE")
           test -n "$TELEGRAM_FILE_ID" || { echo "Telegram did not return a file_id" >&2; exit 1; }
           curl --fail --silent --show-error --retry 3 \
             -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
             -F "chat_id=${TELEGRAM_CHANNEL_ID}" \
-            -F "document=${TELEGRAM_FILE_ID}" \
+            --form-string "document=${TELEGRAM_FILE_ID}" \
             -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
 
       - name: Remove temporary keystore
