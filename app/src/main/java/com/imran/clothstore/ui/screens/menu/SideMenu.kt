@@ -63,11 +63,12 @@ fun SideMenu(
             )
         }
 
-        // ── ড্রয়ার — স্ক্রিনের অর্ধেক প্রস্থ, বাম দিক থেকে স্লাইড ──
+        // ── ড্রয়ার — স্ক্রিনের ৭০% প্রস্থ, ডান দিক থেকে স্লাইড ──
         AnimatedVisibility(
             visible = visible,
-            enter = slideInHorizontally(initialOffsetX = { -it }),
-            exit = slideOutHorizontally(targetOffsetX = { -it })
+            modifier = Modifier.align(Alignment.CenterEnd),
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
             // ড্রয়ার খোলা থাকলে সিস্টেম ব্যাক দিয়ে আগে ড্রয়ারই বন্ধ হবে
             BackHandler(onBack = onClose)
@@ -75,7 +76,7 @@ fun SideMenu(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.7f)
                     .background(AppColors.HeaderTeal)
                     // ড্রয়ারের ভেতরের ফাঁকা জায়গায় চাপ যেন নিচের পর্দায় না পৌঁছে বন্ধ করে না দেয়
                     .pointerInput(Unit) { detectTapGestures { } }
@@ -100,7 +101,6 @@ fun SideMenu(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                         .background(Color.White)
                         .padding(12.dp)
                 ) {

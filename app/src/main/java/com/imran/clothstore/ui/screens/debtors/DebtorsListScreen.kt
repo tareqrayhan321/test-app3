@@ -68,30 +68,26 @@ fun DebtorsListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.HeaderTeal)
+            .background(Color.White)
     ) {
-        // ── হেডার ──
+        // ── হেডার — সাদা, সমান (গোলাকার নয়) ──
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
-                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
-                    )
-                )
+                .background(Color.White)
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp)
         ) {
             Column {
                 Text(
                     text = "Party Ledger",
-                    color = Color.White,
+                    color = Color(0xFF1A1A1A),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "সকল দেনাদার/পাওনাদারের সম্মিলিত তালিকা",
-                    color = Color.White.copy(alpha = 0.75f),
+                    color = Color(0xFF6C6A64),
                     fontSize = 11.sp
                 )
             }
@@ -109,7 +105,7 @@ fun DebtorsListScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(if (isActive) Color(0xFFE0B84A) else Color.White.copy(alpha = 0.15f))
+                            .background(if (isActive) Color(0xFFE0B84A) else Color(0xFFECE8DC))
                             .clickable { viewModel.onTabChange(tab) }
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
@@ -117,7 +113,7 @@ fun DebtorsListScreen(
                             text = tab.labelBn,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isActive) Color(0xFF1A0F06) else Color.White
+                            color = Color(0xFF1A0F06)
                         )
                     }
                 }
@@ -150,12 +146,11 @@ fun DebtorsListScreen(
             }
         }
 
-        // ── বডি (উপরে গোলাকার কোণ) ──
+        // ── বডি (সমান, গোলাকার নয়) ──
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(Color.White)
         ) {
         // ── বডি: টেবিল ──
@@ -172,7 +167,7 @@ fun DebtorsListScreen(
             val nameStyle = LocalTextStyle.current.copy(fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
             val moneyStyle = LocalTextStyle.current.copy(fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold)
             val addrStyle = LocalTextStyle.current.copy(fontSize = 10.5.sp)
-            val headStyle = LocalTextStyle.current.copy(fontSize = 9.5.sp, fontWeight = FontWeight.SemiBold)
+            val headStyle = LocalTextStyle.current.copy(fontSize = 11.sp, fontWeight = FontWeight.Bold)
 
             BoxWithConstraints(modifier = Modifier.weight(1f, fill = true).fillMaxWidth()) {
                 val capWidth = maxWidth * 0.36f
@@ -182,48 +177,52 @@ fun DebtorsListScreen(
 
                 val nameColWidth = remember(rows, nameStyle, density, capWidth) {
                     val maxPx = rows.maxOfOrNull { widthOf(it.entry.name.ifBlank { "—" }, nameStyle) } ?: 0
-                    minOf(capWidth, maxOf(70.dp, with(density) { maxPx.toDp() } + 8.dp))
+                    minOf(capWidth, maxOf(70.dp, with(density) { maxPx.toDp() } + 14.dp))
                 }
                 val moneyColWidth = remember(rows, moneyStyle, headStyle, density) {
                     val maxPx = maxOf(
                         rows.maxOfOrNull { widthOf("৳${it.entry.baki.toLong()}", moneyStyle) } ?: 0,
                         widthOf("পাওনা/বকেয়া", headStyle)
                     )
-                    with(density) { maxPx.toDp() } + 6.dp
+                    with(density) { maxPx.toDp() } + 14.dp
                 }
                 val addrColWidth = remember(rows, addrStyle, density, capWidth) {
                     val maxPx = rows.maxOfOrNull { widthOf(it.entry.addr.ifBlank { "—" }, addrStyle) } ?: 0
-                    minOf(capWidth, maxOf(50.dp, with(density) { maxPx.toDp() } + 8.dp))
+                    minOf(capWidth, maxOf(50.dp, with(density) { maxPx.toDp() } + 14.dp))
                 }
 
-                // কলাম + কল বাটন (26) + জমা বাটন (~50) + ফাঁক (৬ডিপি × ৪) + দুই পাশের প্যাডিং (৮)
-                val tableWidth = maxOf(maxWidth, nameColWidth + moneyColWidth + addrColWidth + 26.dp + 50.dp + 24.dp + 8.dp)
+                // পাঁচটা গ্রিড কলামের যোগফল (নাম + বাকি + ঠিকানা + কল + জমা)
+                val tableWidth = maxOf(maxWidth, nameColWidth + moneyColWidth + addrColWidth + DlCallColWidth + DlJomaColWidth)
                 Box(modifier = Modifier.fillMaxSize().horizontalScroll(rememberScrollState())) {
                     LazyColumn(modifier = Modifier.width(tableWidth).fillMaxHeight()) {
                         // টেবিল হেডার — স্টিকি, ছোট ফন্ট, হালকা রঙের পট্টি; নিচে স্ক্রল করলেও উপরে আটকে থাকে
                         stickyHeader {
-                            Column(modifier = Modifier.fillMaxWidth().background(Color(0xFFF3F0E8))) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 5.dp, horizontal = 4.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text("পার্টির নাম", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(nameColWidth))
-                                    Text("পাওনা/বকেয়া", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(moneyColWidth))
-                                    Text("ঠিকানা", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(addrColWidth))
+                            Row(modifier = Modifier.fillMaxWidth().background(DlHeaderBg).height(34.dp)) {
+                                val hdrs = listOf(
+                                    "পার্টির নাম" to nameColWidth,
+                                    "পাওনা/বকেয়া" to moneyColWidth,
+                                    "ঠিকানা" to addrColWidth,
+                                    "কল" to DlCallColWidth,
+                                    "জমা" to DlJomaColWidth
+                                )
+                                hdrs.forEach { (label, w) ->
+                                    Box(
+                                        modifier = Modifier.width(w).fillMaxHeight().border(0.5.dp, DlHeaderGrid),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(label, style = headStyle, color = Color.White, maxLines = 1, softWrap = false)
+                                    }
                                 }
-                                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFE3DED2)))
                             }
                         }
                         // ডুপ্লিকেট id থাকলেও যেন অ্যাপ ক্র্যাশ না করে — তাই key-তে ইনডেক্সও আছে
-                        itemsIndexed(rows, key = { index, it -> "${it.category.name}_${it.entry.id}_$index" }) { _, row ->
+                        itemsIndexed(rows, key = { index, it -> "${it.category.name}_${it.entry.id}_$index" }) { index, row ->
                             DlTableRow(
                                 row = row,
                                 nameWidth = nameColWidth,
                                 moneyWidth = moneyColWidth,
                                 addrWidth = addrColWidth,
+                                rowIndex = index,
                                 onJomaClick = { jomaDialogRow = row }
                             )
                         }

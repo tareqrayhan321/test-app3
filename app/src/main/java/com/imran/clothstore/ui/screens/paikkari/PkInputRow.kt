@@ -43,12 +43,12 @@ fun PkInputRow(
             modifier = Modifier.width(110.dp)
         )
         Row(
-            modifier = Modifier.width(160.dp),
+            modifier = Modifier.width(196.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             OutlinedTextField(
-                shape = androidx.compose.foundation.shape.CircleShape,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
                 value = value,
                 onValueChange = { new -> if (new.all { it.isDigit() || it == '.' }) onValueChange(new) },
                 placeholder = { Text("0") },
@@ -57,7 +57,7 @@ fun PkInputRow(
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number
                 ),
-                modifier = Modifier.width(100.dp)
+                modifier = Modifier.width(132.dp)
             )
             Text(unit, fontSize = 10.5.sp, color = Color(0xFF9A96AD))
         }
