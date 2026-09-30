@@ -60,6 +60,14 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Set release version from tag
+        run: |
+          VERSION_NAME="${GITHUB_REF_NAME#v}"
+          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION_NAME"
+          VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+
       - name: Decode release keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -69,7 +77,7 @@ jobs:
           test -s "$RUNNER_TEMP/clothstore-release.jks"
 
       - name: Build unsigned production APK
-        run: ./gradlew clean assembleRelease --stacktrace
+        run: ./gradlew clean assembleRelease -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME" --stacktrace
 
       - name: Align and sign production APK
         env:
@@ -108,6 +116,21 @@ jobs:
           The release keystore is not included.
           EOF
           gh release create "$GITHUB_REF_NAME" "$APK" --repo "$GITHUB_REPOSITORY" --title "ClothStore ${GITHUB_REF_NAME}" --notes-file dist/release-notes.md
+
+      - name: Send APK to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          test -n "$TELEGRAM_BOT_TOKEN" || { echo "Missing repository secret: TELEGRAM_BOT_TOKEN" >&2; exit 1; }
+          test -n "$TELEGRAM_CHAT_ID" || { echo "Missing repository secret: TELEGRAM_CHAT_ID" >&2; exit 1; }
+          APK="dist/clothstore-${GITHUB_REF_NAME}.apk"
+          RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+          curl --fail --silent --show-error --retry 3 \
+            -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+            -F "chat_id=${TELEGRAM_CHAT_ID}" \
+            -F "document=@${APK}" \
+            -F "caption=ClothStore ${GITHUB_REF_NAME} signed production APK. Release: ${RELEASE_URL}"
 
       - name: Remove temporary keystore
         if: always()
