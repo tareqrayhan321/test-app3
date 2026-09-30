@@ -55,6 +55,12 @@ fun DetailScreen(
 
     var formKind by remember { mutableStateOf<String?>(null) } // "bokeyoa" | "joma" | null
 
+    // ── রো লং-প্রেস: অ্যাকশন (এডিট/ডিলিট) → ফর্ম → সিক্রেট কী ──
+    var actionRow by remember { mutableStateOf<TxnRow?>(null) }
+    var editingRow by remember { mutableStateOf<TxnRow?>(null) }
+    var deletingRow by remember { mutableStateOf<TxnRow?>(null) }
+    var pendingEdit by remember { mutableStateOf<(() -> Unit)?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -126,7 +132,7 @@ fun DetailScreen(
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
-            TransactionTable(rows = rows)
+            TransactionTable(rows = rows, onRowLongPress = { actionRow = it })
         }
 
         // ── স্টিকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
@@ -183,6 +189,78 @@ fun DetailScreen(
                 )
             }
         }
+    }
+
+    // ── লং-প্রেস অ্যাকশন: এডিট / ডিলিট ──
+    actionRow?.let { row ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { actionRow = null },
+            containerColor = Color.White,
+            title = { Text(if (row.type == TxnType.JOMA) "জমার লেনদেন" else "পাওনা/বকেয়ার লেনদেন", fontSize = 16.sp, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    Text(
+                        listOf(
+                            row.memo.takeIf { it.isNotBlank() }?.let { "ম্যামো $it" },
+                            formatTaka(row.amount)
+                        ).filterNotNull().joinToString(" · "),
+                        fontSize = 13.sp,
+                        color = Color(0xFF4A4740)
+                    )
+                    Button(
+                        onClick = { editingRow = row; actionRow = null },
+                        modifier = Modifier.fillMaxWidth().padding(top = 14.dp).height(44.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal)
+                    ) { Text("✏️ এডিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                    Button(
+                        onClick = { deletingRow = row; actionRow = null },
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(44.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828))
+                    ) { Text("🗑️ ডিলিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { actionRow = null }) { Text("বাতিল", color = Color(0xFF6C6A64)) }
+            }
+        )
+    }
+
+    // ── এডিট ফর্ম (সেভে সিক্রেট কী চাইবে) ──
+    editingRow?.let { row ->
+        EditTransactionSheet(
+            row = row,
+            isCustomerType = category.isCustomerType,
+            onDismiss = { editingRow = null; pendingEdit = null },
+            onSave = { memo, date, goj, amount, note, joma ->
+                pendingEdit = {
+                    viewModel.editRow(row, memo, date, goj, amount, note, joma)
+                    editingRow = null
+                }
+            }
+        )
+    }
+    pendingEdit?.let { action ->
+        com.imran.clothstore.ui.components.SecretKeyDialog(
+            message = "পরিবর্তন সেভ করতে সিক্রেট কী দিন।",
+            confirmLabel = "সেভ করুন",
+            onConfirm = { action(); pendingEdit = null },
+            onDismiss = { pendingEdit = null }
+        )
+    }
+
+    // ── ডিলিট (সিক্রেট কী) ──
+    deletingRow?.let { row ->
+        com.imran.clothstore.ui.components.SecretKeyDialog(
+            message = if (row.jomaSrc != null)
+                "এই লেনদেন (বিল ও সাথের জমা দুটোই) ডিলিট করতে সিক্রেট কী দিন।"
+            else "এই লেনদেন ডিলিট করতে সিক্রেট কী দিন।",
+            confirmLabel = "ডিলিট করুন",
+            onConfirm = { viewModel.deleteRow(row); deletingRow = null },
+            onDismiss = { deletingRow = null }
+        )
     }
 
     formKind?.let { kind ->

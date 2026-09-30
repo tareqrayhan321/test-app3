@@ -16,8 +16,17 @@ data class TxnRow(
      * _mergeJoma প্যাটার্ন — index.html লাইন ৬১৫০-৬১৬৪)। null মানে এই রো merge হয়নি —
      * টেবিলের "জমা" কলামে তখন "—" দেখানো হয়। শুধু BILL_OR_PAWNA টাইপ রো-তেই সেট হতে পারে।
      */
-    val mergedJomaAmount: Double? = null
+    val mergedJomaAmount: Double? = null,
+    /** এই রো-র উৎস: history-র ইনডেক্স (>= 0), অথবা SRC_BASE_BILL / SRC_BASE_JOMA (মূল এন্ট্রির ফিল্ড) */
+    val src: Int = SRC_BASE_BILL,
+    /** মার্জ হওয়া জমার উৎস (একই নিয়ম), মার্জ না হলে null */
+    val jomaSrc: Int? = null
 )
+
+/** মূল এন্ট্রির bill/initPawna ফিল্ড থেকে আসা রো */
+const val SRC_BASE_BILL = -1
+/** মূল এন্ট্রির joma ফিল্ড থেকে আসা রো */
+const val SRC_BASE_JOMA = -2
 
 enum class TxnType { BILL_OR_PAWNA, JOMA }
 
@@ -32,22 +41,22 @@ enum class TxnType { BILL_OR_PAWNA, JOMA }
 fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
     data class RawTxn(
         val date: String, val memo: String, val type: TxnType,
-        val amount: Double, val goj: String, val note: String
+        val amount: Double, val goj: String, val note: String, val src: Int
     )
 
     val raw = mutableListOf<RawTxn>()
 
     if (isCustomer) {
         if (entry.bill > 0) {
-            raw.add(RawTxn(entry.date, entry.memo, TxnType.BILL_OR_PAWNA, entry.bill, entry.goj, entry.note))
+            raw.add(RawTxn(entry.date, entry.memo, TxnType.BILL_OR_PAWNA, entry.bill, entry.goj, entry.note, SRC_BASE_BILL))
         }
         if (entry.joma > 0) {
-            raw.add(RawTxn(entry.date, entry.memo, TxnType.JOMA, entry.joma, "", ""))
+            raw.add(RawTxn(entry.date, entry.memo, TxnType.JOMA, entry.joma, "", "", SRC_BASE_JOMA))
         }
-        entry.history.forEach { h ->
+        entry.history.forEachIndexed { idx, h ->
             when (h.type) {
-                "bokeyoa" -> raw.add(RawTxn(h.date, h.memo, TxnType.BILL_OR_PAWNA, h.bokeyoaAmount(isCustomer = true), h.goj, h.note))
-                "joma" -> raw.add(RawTxn(h.date, h.memo, TxnType.JOMA, h.joma, "", h.note))
+                "bokeyoa" -> raw.add(RawTxn(h.date, h.memo, TxnType.BILL_OR_PAWNA, h.bokeyoaAmount(isCustomer = true), h.goj, h.note, idx))
+                "joma" -> raw.add(RawTxn(h.date, h.memo, TxnType.JOMA, h.joma, "", h.note, idx))
             }
         }
     } else {
@@ -58,16 +67,16 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
         // পুরনো এন্ট্রি — ওয়েব অ্যাপের ফলব্যাক প্যাটার্নের সাথে সামঞ্জস্যপূর্ণ)
         val initPawna = entry.initPawna ?: (entry.baki + entry.joma)
         if (initPawna > 0) {
-            raw.add(RawTxn(entry.date, entry.memo, TxnType.BILL_OR_PAWNA, initPawna, entry.goj, entry.note))
+            raw.add(RawTxn(entry.date, entry.memo, TxnType.BILL_OR_PAWNA, initPawna, entry.goj, entry.note, SRC_BASE_BILL))
         }
         if (entry.joma > 0) {
-            raw.add(RawTxn(entry.date, entry.memo, TxnType.JOMA, entry.joma, "", ""))
+            raw.add(RawTxn(entry.date, entry.memo, TxnType.JOMA, entry.joma, "", "", SRC_BASE_JOMA))
         }
-        entry.history.forEach { h ->
+        entry.history.forEachIndexed { idx, h ->
             when (h.type) {
                 // ওয়েব অ্যাপে মহাজনের history আইটেমে বকেয়ার পরিমাণ h.baki ফিল্ডে থাকে, h.bill এ নয়
-                "bokeyoa" -> raw.add(RawTxn(h.date, h.memo, TxnType.BILL_OR_PAWNA, h.bokeyoaAmount(isCustomer = false), h.goj, h.note))
-                "joma" -> raw.add(RawTxn(h.date, h.memo, TxnType.JOMA, h.joma, "", h.note))
+                "bokeyoa" -> raw.add(RawTxn(h.date, h.memo, TxnType.BILL_OR_PAWNA, h.bokeyoaAmount(isCustomer = false), h.goj, h.note, idx))
+                "joma" -> raw.add(RawTxn(h.date, h.memo, TxnType.JOMA, h.joma, "", h.note, idx))
             }
         }
         // মহাজনের ক্ষেত্রে ওয়েব অ্যাপ তারিখ অনুযায়ী sort করে
@@ -82,7 +91,8 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
     data class MergedTxn(
         val date: String, val memo: String, val type: TxnType,
         val amount: Double, val goj: String, val note: String,
-        val mergedJomaAmount: Double?, val mergedJomaNote: String?
+        val mergedJomaAmount: Double?, val mergedJomaNote: String?,
+        val src: Int, val mateSrc: Int?
     )
 
     val consumedJomaIdx = mutableSetOf<Int>()
@@ -106,7 +116,8 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
                     MergedTxn(
                         date = t.date, memo = t.memo, type = t.type, amount = t.amount,
                         goj = t.goj, note = t.note.ifBlank { mate.note },
-                        mergedJomaAmount = mate.amount, mergedJomaNote = mate.note
+                        mergedJomaAmount = mate.amount, mergedJomaNote = mate.note,
+                        src = t.src, mateSrc = mate.src
                     )
                 )
                 continue
@@ -116,7 +127,8 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
         merged.add(
             MergedTxn(
                 date = t.date, memo = t.memo, type = t.type, amount = t.amount,
-                goj = t.goj, note = t.note, mergedJomaAmount = null, mergedJomaNote = null
+                goj = t.goj, note = t.note, mergedJomaAmount = null, mergedJomaNote = null,
+                src = t.src, mateSrc = null
             )
         )
     }
@@ -139,7 +151,9 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
             runningBaki = running,
             goj = t.goj,
             note = t.note,
-            mergedJomaAmount = t.mergedJomaAmount
+            mergedJomaAmount = t.mergedJomaAmount,
+            src = t.src,
+            jomaSrc = t.mateSrc
         )
     }
 }

@@ -29,6 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +64,7 @@ fun FvListScreen(
     val selectedForAction by viewModel.selectedForAction.collectAsState()
     val isFormOpen by viewModel.isFormOpen.collectAsState()
     val editingEntry by viewModel.editingEntry.collectAsState()
+    var pendingDelete by remember { mutableStateOf<Entry?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
     Column(
@@ -197,7 +201,7 @@ fun FvListScreen(
                             },
                             onLongPress = { viewModel.selectForAction(entry) },
                             onEdit = { viewModel.openEditForm(entry) },
-                            onDelete = { viewModel.deleteEntry(entry) }
+                            onDelete = { pendingDelete = entry }
                         )
                     }
                 }
@@ -219,6 +223,22 @@ fun FvListScreen(
     ) {
         Icon(person_add, contentDescription = "নতুন এন্ট্রি", modifier = Modifier.size(24.dp))
     }
+    }
+
+    // ── ডিলিটের আগে সিক্রেট কী ──
+    pendingDelete?.let { target ->
+        com.imran.clothstore.ui.components.SecretKeyDialog(
+            message = "\"${target.name.ifBlank { "এই এন্ট্রি" }}\" ডিলিট করতে সিক্রেট কী দিন। ডিলিট করলে এর সব লেনদেনও মুছে যাবে।",
+            confirmLabel = "ডিলিট করুন",
+            onConfirm = {
+                viewModel.deleteEntry(target)
+                pendingDelete = null
+            },
+            onDismiss = {
+                pendingDelete = null
+                viewModel.selectForAction(null)
+            }
+        )
     }
 
     // ── এন্ট্রি ফর্ম ডায়ালগ ──

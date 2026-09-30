@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.combinedClickable
 import com.imran.clothstore.util.formatTaka
 import com.imran.clothstore.util.toBengaliDigits
 
@@ -31,7 +32,8 @@ import com.imran.clothstore.util.toBengaliDigits
  * কলাম: তারিখ | ম্যামো | পাওনা/প্রাপ্য | জমা | মোট বাকি | গজ | মন্তব্য — অনুভূমিক স্ক্রলযোগ্য।
  */
 @Composable
-fun TransactionTable(rows: List<TxnRow>) {
+fun TransactionTable(rows: List<TxnRow>, onRowLongPress: (TxnRow) -> Unit = {}) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val colWidths = listOf(96.dp, 72.dp, 116.dp, 100.dp, 108.dp, 76.dp, 200.dp)
     val headers = listOf("তারিখ", "ম্যামো", "পাওনা/প্রাপ্য", "জমা", "মোট বাকি", "গজ", "মন্তব্য")
     // পার্টি লেজারের এক্সেল টেবিলের সাথে হুবহু এক ভিজুয়াল: সাদা / হালকা-বেজ বিকল্প রো, একই গ্রিড ও হেডার রঙ
@@ -77,7 +79,19 @@ fun TransactionTable(rows: List<TxnRow>) {
 
         rows.forEachIndexed { index, row ->
             val bg = if (index % 2 == 0) rowEven else rowOdd
-            Row(modifier = Modifier.background(bg).height(ROW_H)) {
+            Row(
+                modifier = Modifier
+                    .background(bg)
+                    .height(ROW_H)
+                    // লং-প্রেসে এডিট/ডিলিট অপশন (সাধারণ ট্যাপে কিছু হয় না)
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            onRowLongPress(row)
+                        }
+                    )
+            ) {
                 Cell(formatDateShort(row.date), colWidths[0], grid, TextAlign.Center)
                 Cell(row.memo.ifBlank { "—" }.toBengaliDigits(), colWidths[1], grid, TextAlign.Center, bold = row.memo.isNotBlank())
                 Cell(
