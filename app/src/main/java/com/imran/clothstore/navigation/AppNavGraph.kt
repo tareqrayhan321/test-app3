@@ -17,7 +17,6 @@ import com.imran.clothstore.ui.screens.debtors.DebtorsListScreen
 import com.imran.clothstore.ui.screens.detail.DetailScreen
 import com.imran.clothstore.ui.screens.fvlist.FvListScreen
 import com.imran.clothstore.ui.screens.home.HomeScreen
-import com.imran.clothstore.ui.screens.menu.SideMenu
 import com.imran.clothstore.ui.screens.notif.NotificationPanel
 import com.imran.clothstore.ui.screens.notif.NotificationViewModel
 import com.imran.clothstore.ui.screens.reports.AggregateReportOverlay
@@ -52,7 +51,9 @@ object Routes {
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
+    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier,
+    // সাইড ড্রয়ার এখন স্ক্রিনের উপরে ভাসে (AppRoot-এ রেন্ডার হয়), তাই আলাদা রুট নেই
+    onMenuClick: () -> Unit = {}
 ) {
     // Aggregate Report, Net Profit Breakdown, P&L Trends সবাই একই weekly_reports ডেটা পড়ে,
     // তাই NavGraph-স্কোপড শেয়ার্ড ViewModel ব্যবহার করা হচ্ছে (একাধিকবার Firestore listener না খোলার জন্য)।
@@ -83,7 +84,7 @@ fun AppNavGraph(
                     }
                 },
                 onNotifClick = { navController.navigate(Routes.NOTIFICATION_PANEL) },
-                onMenuClick = { navController.navigate(Routes.SIDE_MENU) },
+                onMenuClick = onMenuClick,
                 onAggregateReportClick = { navController.navigate(Routes.AGGREGATE_REPORT) },
                 onPLTrendsClick = { navController.navigate(Routes.PL_TRENDS) },
                 onFabricClick = { navController.navigate(Routes.FABRIC) },
@@ -97,7 +98,7 @@ fun AppNavGraph(
         composable(Routes.DASHBOARD) {
             com.imran.clothstore.ui.screens.dashboard.DashboardScreen(
                 onNotifClick = { navController.navigate(Routes.NOTIFICATION_PANEL) },
-                onMenuClick = { navController.navigate(Routes.SIDE_MENU) },
+                onMenuClick = onMenuClick,
                 onNetProfitClick = { navController.navigate(Routes.NET_PROFIT_BREAKDOWN) },
                 onAggregateReportClick = { navController.navigate(Routes.AGGREGATE_REPORT) },
                 onPaikkariClick = { navController.navigate(Routes.PAIKKARI_CALCULATOR) },
@@ -192,15 +193,6 @@ fun AppNavGraph(
         composable(Routes.DB_CONNECT) {
             DbConnectModal(
                 onClose = { navController.popBackStack() }
-            )
-        }
-
-        composable(Routes.SIDE_MENU) {
-            SideMenu(
-                onClose = { navController.popBackStack() },
-                onNavigateHome = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
-                }
             )
         }
 

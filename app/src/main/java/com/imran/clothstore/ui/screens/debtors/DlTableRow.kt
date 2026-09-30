@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
  * ঠিক পাঁচ কলামের কাঠামো (fv-excel টেবিলের সমতুল্য)।
  */
 @Composable
-fun DlTableRow(row: DebtorRow, nameWidth: Dp, onJomaClick: () -> Unit) {
+fun DlTableRow(row: DebtorRow, nameWidth: Dp, moneyWidth: Dp, addrWidth: Dp, onJomaClick: () -> Unit) {
     val entry = row.entry
     val baki = entry.baki
     val isZero = baki == 0.0
@@ -40,28 +40,26 @@ fun DlTableRow(row: DebtorRow, nameWidth: Dp, onJomaClick: () -> Unit) {
         modifier = Modifier
             .padding(vertical = 6.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
             text = entry.name.ifBlank { "—" },
-            fontSize = 12.sp,
+            fontSize = 11.5.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(nameWidth),
-            softWrap = false
+            modifier = Modifier.width(nameWidth)
         )
         Text(
             text = "৳${baki.toLong()}",
-            fontSize = 12.sp,
+            fontSize = 11.5.sp,
             fontWeight = FontWeight.SemiBold,
             color = if (isZero) Color(0xFF2BB673) else Color(0xFFD9452B),
-            modifier = Modifier.width(64.dp)
+            modifier = Modifier.width(moneyWidth)
         )
         Text(
             text = entry.addr.ifBlank { "—" },
-            fontSize = 11.sp,
+            fontSize = 10.5.sp,
             color = Color(0xFF5A4A30),
-            modifier = Modifier.width(90.dp),
-            maxLines = 1
+            modifier = Modifier.width(addrWidth)
         )
 
         // কল বাটন
@@ -69,7 +67,7 @@ fun DlTableRow(row: DebtorRow, nameWidth: Dp, onJomaClick: () -> Unit) {
         val hasMob = entry.mob.isNotBlank()
         Box(
             modifier = Modifier
-                .size(28.dp)
+                .size(26.dp)
                 .clip(CircleShape)
                 .background(if (hasMob) Color(0xFF2E7D32) else Color(0xFF3A3020))
                 .clickable(enabled = hasMob) {

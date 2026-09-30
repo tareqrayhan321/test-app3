@@ -2,6 +2,7 @@ package com.imran.clothstore.ui.screens.debtors
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -20,9 +22,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -120,20 +123,31 @@ fun DebtorsListScreen(
                 }
             }
 
-            OutlinedTextField(
-                shape = androidx.compose.foundation.shape.CircleShape,
-                value = query,
-                onValueChange = viewModel::onSearchChange,
-                placeholder = { Text("নাম বা ঠিকানা খুঁজুন…") },
-                singleLine = true,
+            // সার্চ বক্স — গোল (pill) নয়, গোলাকার-কোণা আয়তক্ষেত্র; উচ্চতা আগের ৫৬dp থেকে কমিয়ে ৪৬dp
+            val searchShape = RoundedCornerShape(12.dp)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    .padding(top = 10.dp)
+                    .height(46.dp)
+                    .clip(searchShape)
+                    .background(Color.White)
+                    .border(1.dp, Color(0xFF79747E), searchShape)
+                    .padding(horizontal = 14.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                BasicTextField(
+                    value = query,
+                    onValueChange = viewModel::onSearchChange,
+                    singleLine = true,
+                    textStyle = TextStyle(fontSize = 14.sp, color = Color(0xFF1C1B1F)),
+                    cursorBrush = SolidColor(Color(0xFF0B4A4E)),
+                    modifier = Modifier.fillMaxWidth()
                 )
-            )
+                if (query.isEmpty()) {
+                    Text("নাম বা ঠিকানা খুঁজুন…", fontSize = 14.sp, color = Color(0xFF8A8794))
+                }
+            }
         }
 
         // ── বডি (উপরে গোলাকার কোণ) ──
@@ -150,42 +164,68 @@ fun DebtorsListScreen(
                 Text("কোনো এন্ট্রি পাওয়া যায়নি", fontSize = 13.sp, color = Color(0xFF9A96AD))
             }
         } else {
-            // নামের কলামের প্রস্থ = সবচেয়ে লম্বা নাম যতটা জায়গা নেয় ততটা (নাম কখনো কাটা পড়বে না);
-            // টেবিল চওড়া হলে পাশে স্ক্রল করে বাকি অংশ দেখা যাবে।
+            // প্রতিটা কলামের প্রস্থ = ওই কলামের সবচেয়ে লম্বা লেখা যতটা জায়গা নেয় ততটা — নাম/ঠিকানা কাটা পড়বে না।
+            // অস্বাভাবিক লম্বা নাম/ঠিকানা হলে কলাম একটা সীমায় থামে ও লেখা পরের লাইনে নামে (তবু পুরোটাই দেখা যায়)।
+            // টেবিল স্ক্রিনের চেয়ে চওড়া হলে পাশে স্ক্রল করে বাকি অংশ দেখা যাবে।
             val textMeasurer = rememberTextMeasurer()
             val density = LocalDensity.current
-            val nameStyle = LocalTextStyle.current.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            val nameColWidth = remember(rows, nameStyle, density) {
-                val maxPx = rows.maxOfOrNull { r ->
-                    textMeasurer.measure(
-                        text = r.entry.name.ifBlank { "—" },
-                        style = nameStyle,
-                        softWrap = false
-                    ).size.width
-                } ?: 0
-                with(density) { maxOf(90.dp, maxPx.toDp() + 8.dp) }
-            }
+            val nameStyle = LocalTextStyle.current.copy(fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+            val moneyStyle = LocalTextStyle.current.copy(fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold)
+            val addrStyle = LocalTextStyle.current.copy(fontSize = 10.5.sp)
+            val headStyle = LocalTextStyle.current.copy(fontSize = 9.5.sp, fontWeight = FontWeight.SemiBold)
 
             BoxWithConstraints(modifier = Modifier.weight(1f, fill = true).fillMaxWidth()) {
-                val tableWidth = maxOf(maxWidth, nameColWidth + 280.dp)
+                val capWidth = maxWidth * 0.36f
+
+                fun widthOf(text: String, style: TextStyle): Int =
+                    textMeasurer.measure(text = text, style = style, softWrap = false).size.width
+
+                val nameColWidth = remember(rows, nameStyle, density, capWidth) {
+                    val maxPx = rows.maxOfOrNull { widthOf(it.entry.name.ifBlank { "—" }, nameStyle) } ?: 0
+                    minOf(capWidth, maxOf(70.dp, with(density) { maxPx.toDp() } + 8.dp))
+                }
+                val moneyColWidth = remember(rows, moneyStyle, headStyle, density) {
+                    val maxPx = maxOf(
+                        rows.maxOfOrNull { widthOf("৳${it.entry.baki.toLong()}", moneyStyle) } ?: 0,
+                        widthOf("পাওনা/বকেয়া", headStyle)
+                    )
+                    with(density) { maxPx.toDp() } + 6.dp
+                }
+                val addrColWidth = remember(rows, addrStyle, density, capWidth) {
+                    val maxPx = rows.maxOfOrNull { widthOf(it.entry.addr.ifBlank { "—" }, addrStyle) } ?: 0
+                    minOf(capWidth, maxOf(50.dp, with(density) { maxPx.toDp() } + 8.dp))
+                }
+
+                // কলাম + কল বাটন (26) + জমা বাটন (~50) + ফাঁক (৬ডিপি × ৪) + দুই পাশের প্যাডিং (৮)
+                val tableWidth = maxOf(maxWidth, nameColWidth + moneyColWidth + addrColWidth + 26.dp + 50.dp + 24.dp + 8.dp)
                 Box(modifier = Modifier.fillMaxSize().horizontalScroll(rememberScrollState())) {
                     LazyColumn(modifier = Modifier.width(tableWidth).fillMaxHeight()) {
-                        item {
-                            // টেবিল হেডার
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.White)
-                                    .padding(vertical = 8.dp, horizontal = 4.dp)
-                            ) {
-                                Text("পার্টির নাম", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(nameColWidth))
-                                Text("পাওনা/বকেয়া", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(64.dp))
-                                Text("ঠিকানা", fontSize = 10.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(90.dp))
+                        // টেবিল হেডার — স্টিকি, ছোট ফন্ট, হালকা রঙের পট্টি; নিচে স্ক্রল করলেও উপরে আটকে থাকে
+                        stickyHeader {
+                            Column(modifier = Modifier.fillMaxWidth().background(Color(0xFFF3F0E8))) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp, horizontal = 4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("পার্টির নাম", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(nameColWidth))
+                                    Text("পাওনা/বকেয়া", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(moneyColWidth))
+                                    Text("ঠিকানা", style = headStyle, color = Color(0xFF6C6A64), maxLines = 1, softWrap = false, modifier = Modifier.width(addrColWidth))
+                                }
+                                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFE3DED2)))
                             }
                         }
                         // ডুপ্লিকেট id থাকলেও যেন অ্যাপ ক্র্যাশ না করে — তাই key-তে ইনডেক্সও আছে
                         itemsIndexed(rows, key = { index, it -> "${it.category.name}_${it.entry.id}_$index" }) { _, row ->
-                            DlTableRow(row = row, nameWidth = nameColWidth, onJomaClick = { jomaDialogRow = row })
+                            DlTableRow(
+                                row = row,
+                                nameWidth = nameColWidth,
+                                moneyWidth = moneyColWidth,
+                                addrWidth = addrColWidth,
+                                onJomaClick = { jomaDialogRow = row }
+                            )
                         }
                     }
                 }

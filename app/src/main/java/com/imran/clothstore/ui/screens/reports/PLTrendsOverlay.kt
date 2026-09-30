@@ -20,6 +20,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.imran.clothstore.util.toBengaliDigits
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -74,17 +77,25 @@ fun PLTrendsOverlay(
             return@Column
         }
 
-        Box(
+        // চার্ট লম্বা হলে (লম্বা সপ্তাহ-লেবেল) যেন পুরোটা দেখা যায়, তাই পেজ উপর-নিচ স্ক্রলযোগ্য
+        Column(
             modifier = Modifier
-                .padding(16.dp)
+                .weight(1f)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFFEFE8DC))
-                .border(BorderStroke(1.dp, Color(0xFFE2D9C4)), RoundedCornerShape(24.dp))
-                .padding(vertical = 14.dp, horizontal = 12.dp)
-                .horizontalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState())
         ) {
-            RevenueBarChart(reports)
+            Box(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp, top = 28.dp, bottom = 16.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color(0xFFEFE8DC))
+                    .border(BorderStroke(1.dp, Color(0xFFE2D9C4)), RoundedCornerShape(24.dp))
+                    .padding(top = 28.dp, bottom = 14.dp, start = 12.dp, end = 12.dp)
+                    .horizontalScroll(rememberScrollState())
+            ) {
+                RevenueBarChart(reports)
+            }
         }
     }
 }
@@ -93,8 +104,21 @@ fun PLTrendsOverlay(
 private fun RevenueBarChart(reports: List<WeeklyReport>) {
     val barWidthDp = 38.dp
     val gapDp = 18.dp
-    val chartHeightDp = 420.dp
     val leftPad = 6.dp
+    val density = LocalDensity.current
+
+    // উল্লম্ব সপ্তাহ-লেবেলের সবচেয়ে লম্বাটা মেপে তার জন্য যথেষ্ট উচ্চতা রাখা হয় —
+    // আগে স্থির ৩০% জায়গায় লম্বা লেবেল ক্যানভাসের উপরে ছাড়িয়ে কাটা পড়ত।
+    val labelBandDp = remember(reports, density) {
+        val p = android.graphics.Paint().apply {
+            textSize = with(density) { 13.sp.toPx() }
+            isAntiAlias = true
+        }
+        val maxPx = reports.maxOfOrNull { p.measureText(it.label) } ?: 0f
+        with(density) { maxPx.toDp() } + 16.dp
+    }
+    // নিচের প্লট এলাকা আগের মতোই (৪২০ × ০.৭০ ≈ ২৯৪dp) — ৩০০dp
+    val chartHeightDp = labelBandDp + 300.dp
     val chartWidthDp = leftPad + barWidthDp * reports.size + gapDp * (reports.size - 1).coerceAtLeast(0) + 10.dp
 
     val absMax = max(1.0, reports.maxOf { abs(it.net) })
@@ -110,7 +134,7 @@ private fun RevenueBarChart(reports: List<WeeklyReport>) {
         val barWidthPx = barWidthDp.toPx()
         val gapPx = gapDp.toPx()
         val startX = leftPad.toPx()
-        val labelBand = size.height * 0.30f          // উপরে উল্লম্ব লেবেলের জায়গা
+        val labelBand = labelBandDp.toPx()            // উপরে উল্লম্ব লেবেলের জায়গা (লেবেল মেপে)
         val zeroY = labelBand + (size.height - labelBand) * 0.36f
         val upHalf = zeroY - labelBand - 34.dp.toPx()
         val downHalf = size.height - zeroY - 34.dp.toPx()

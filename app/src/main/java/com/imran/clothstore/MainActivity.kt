@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,6 +21,7 @@ import com.imran.clothstore.navigation.AppNavGraph
 import com.imran.clothstore.navigation.Routes
 import com.imran.clothstore.ui.components.BottomNavBar
 import com.imran.clothstore.ui.components.BottomNavTab
+import com.imran.clothstore.ui.screens.menu.SideMenu
 import com.imran.clothstore.ui.theme.ImranClothStoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,9 +47,21 @@ private fun AppRoot() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    var menuOpen by remember { mutableStateOf(false) }
 
     AppRootContent(
         currentRoute = currentRoute,
+        menuOpen = menuOpen,
+        onMenuClose = { menuOpen = false },
+        onMenuHome = {
+            menuOpen = false
+            if (currentRoute != Routes.HOME) {
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.HOME) { inclusive = false }
+                    launchSingleTop = true
+                }
+            }
+        },
         onNavigate = { tab ->
             val target = if (tab == BottomNavTab.DASHBOARD) Routes.DASHBOARD else Routes.HOME
             if (target != currentRoute) {
@@ -58,7 +74,8 @@ private fun AppRoot() {
         content = { modifier ->
             AppNavGraph(
                 navController = navController,
-                modifier = modifier
+                modifier = modifier,
+                onMenuClick = { menuOpen = true }
             )
         }
     )
@@ -67,6 +84,9 @@ private fun AppRoot() {
 @Composable
 private fun AppRootContent(
     currentRoute: String?,
+    menuOpen: Boolean,
+    onMenuClose: () -> Unit,
+    onMenuHome: () -> Unit,
     onNavigate: (BottomNavTab) -> Unit,
     content: @Composable (Modifier) -> Unit
 ) {
@@ -83,6 +103,12 @@ private fun AppRootContent(
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
+        // সাইড ড্রয়ার — সবার উপরে (বটম বারেরও উপরে), স্ক্রিনের অর্ধেক প্রস্থ
+        SideMenu(
+            visible = menuOpen,
+            onClose = onMenuClose,
+            onNavigateHome = onMenuHome
+        )
     }
 }
 
@@ -92,6 +118,9 @@ private fun AppRootPreview() {
     ImranClothStoreTheme {
         AppRootContent(
             currentRoute = Routes.HOME,
+            menuOpen = false,
+            onMenuClose = {},
+            onMenuHome = {},
             onNavigate = {},
             content = { modifier ->
                 Box(

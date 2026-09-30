@@ -1,26 +1,37 @@
 package com.imran.clothstore.ui.screens.menu
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,40 +44,69 @@ import com.imran.clothstore.ui.theme.AppColors
  */
 @Composable
 fun SideMenu(
+    visible: Boolean,
     onClose: () -> Unit,
     onNavigateHome: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .width(280.dp)
-            .background(AppColors.HeaderTeal)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
-                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // ── পেছনের আবছা পর্দা — চাপ দিলে ড্রয়ার বন্ধ ──
+        AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.45f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClose
                     )
-                )
-                .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("মেনু", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            )
         }
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color.White)
-                .padding(12.dp)
+        // ── ড্রয়ার — স্ক্রিনের অর্ধেক প্রস্থ, বাম দিক থেকে স্লাইড ──
+        AnimatedVisibility(
+            visible = visible,
+            enter = slideInHorizontally(initialOffsetX = { -it }),
+            exit = slideOutHorizontally(targetOffsetX = { -it })
         ) {
-            MenuItem(Icons.Filled.Home, "হোম", onNavigateHome)
+            // ড্রয়ার খোলা থাকলে সিস্টেম ব্যাক দিয়ে আগে ড্রয়ারই বন্ধ হবে
+            BackHandler(onBack = onClose)
+
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.5f)
+                    .background(AppColors.HeaderTeal)
+                    // ড্রয়ারের ভেতরের ফাঁকা জায়গায় চাপ যেন নিচের পর্দায় না পৌঁছে বন্ধ করে না দেয়
+                    .pointerInput(Unit) { detectTapGestures { } }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
+                            )
+                        )
+                        .statusBarsPadding()
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("মেনু", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                        .background(Color.White)
+                        .padding(12.dp)
+                ) {
+                    MenuItem(Icons.Filled.Home, "হোম", onNavigateHome)
+                }
+            }
         }
     }
 }
