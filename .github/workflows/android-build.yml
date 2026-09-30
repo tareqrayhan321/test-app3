@@ -1,13 +1,15 @@
-name: Android Build
+name: Android Build and Release
 
 on:
   push:
     branches: ["main"]
+    tags: ["v*"]
   pull_request:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   JAVA_VERSION: "21"
@@ -15,8 +17,8 @@ env:
 jobs:
   assemble-debug:
     name: Assemble debug APK
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,3 +42,73 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: Build and publish signed production APK
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Decode release keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$ANDROID_KEYSTORE_BASE64" || { echo "Missing repository secret: ANDROID_KEYSTORE_BASE64" >&2; exit 1; }
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/clothstore-release.jks"
+          test -s "$RUNNER_TEMP/clothstore-release.jks"
+
+      - name: Build unsigned production APK
+        run: ./gradlew clean assembleRelease --stacktrace
+
+      - name: Align and sign production APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_PASSWORD" || { echo "Missing repository secret: KEYSTORE_PASSWORD" >&2; exit 1; }
+          test -n "$KEY_ALIAS" || { echo "Missing repository secret: KEY_ALIAS" >&2; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo "Missing repository secret: KEY_PASSWORD" >&2; exit 1; }
+          UNSIGNED_APK=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name '*unsigned*.apk' -print -quit)
+          test -n "$UNSIGNED_APK" || { echo "Unsigned release APK not found" >&2; exit 1; }
+          ZIPALIGN=$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          test -x "$ZIPALIGN" || { echo "zipalign not found" >&2; exit 1; }
+          test -x "$APKSIGNER" || { echo "apksigner not found" >&2; exit 1; }
+          mkdir -p dist
+          "$ZIPALIGN" -f -p 4 "$UNSIGNED_APK" dist/clothstore-release-aligned.apk
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/clothstore-release.jks" --ks-key-alias "$KEY_ALIAS" --ks-pass "env:KEYSTORE_PASSWORD" --key-pass "env:KEY_PASSWORD" --out "dist/clothstore-${GITHUB_REF_NAME}.apk" dist/clothstore-release-aligned.apk
+          rm -f dist/clothstore-release-aligned.apk
+          "$APKSIGNER" verify --verbose "dist/clothstore-${GITHUB_REF_NAME}.apk"
+          sha256sum "dist/clothstore-${GITHUB_REF_NAME}.apk" | tee dist/SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK="dist/clothstore-${GITHUB_REF_NAME}.apk"
+          SHA=$(awk '{print $1}' dist/SHA256SUMS.txt)
+          cat > dist/release-notes.md <<EOF
+          Signed production APK for ${GITHUB_REF_NAME}.
+
+          Commit: ${GITHUB_SHA}
+          SHA-256: ${SHA}
+
+          The release keystore is not included.
+          EOF
+          gh release create "$GITHUB_REF_NAME" "$APK" --repo "$GITHUB_REPOSITORY" --title "ClothStore ${GITHUB_REF_NAME}" --notes-file dist/release-notes.md
+
+      - name: Remove temporary keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/clothstore-release.jks"
