@@ -1,12 +1,16 @@
 package com.imran.clothstore.ui.screens.reports
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -32,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -58,45 +63,40 @@ fun AggregateReportOverlay(
     val sumIn = reports.sumOf { it.cashIn }
     val sumOut = reports.sumOf { it.cashOut }
 
-    // নোটিফিকেশন স্ক্রিনের কাঠামো: টিল পটভূমি → গ্রেডিয়েন্ট হেডার (স্ট্যাটাস বারের নিচে) → গোলাকার-মাথা বডি
+    // পার্টি লেজারের কাঠামো: সাদা সমান হেডার (স্ট্যাটাস বারের নিচে) → সমান বডি → এক্সেল গ্রিড টেবিল
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.HeaderTeal)
+            .background(Color.White)
     ) {
-        // ── হেডার ──
+        // ── হেডার — সাদা, সমান (গোলাকার নয়) ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    androidx.compose.ui.graphics.Brush.verticalGradient(
-                        listOf(Color(0xFF0B4A4E), AppColors.HeaderTeal)
-                    )
-                )
+                .background(Color.White)
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Aggregate Report", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Text("Aggregate Report", color = Color(0xFF1A1A1A), fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 Text(
                     text = if (reports.isEmpty()) "কোনো ডাটা নেই" else "${reports.size} সপ্তাহের ডাটা",
-                    color = Color.White.copy(alpha = 0.75f),
+                    color = Color(0xFF6C6A64),
                     fontSize = 11.sp
                 )
             }
             IconButton(onClick = onClose) {
-                Icon(Icons.Filled.Close, contentDescription = "বন্ধ করুন", tint = Color.White)
+                Icon(Icons.Filled.Close, contentDescription = "বন্ধ করুন", tint = Color(0xFF1A1A1A))
             }
         }
 
-        // ── বডি (উপরে গোলাকার কোণ) ──
+        // ── বডি (সমান, গোলাকার নয়) ──
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .clip(androidx.compose.foundation.shape.RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(Color.White)
         ) {
         if (reports.isEmpty()) {
@@ -113,26 +113,37 @@ fun AggregateReportOverlay(
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            val colWidths = listOf(90.dp, 70.dp, 70.dp, 76.dp, 76.dp, 70.dp, 70.dp)
+            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 92.dp)
             val headers = listOf("সপ্তাহ", "ইন-স্টক", "আউট-স্টক", "নেট", "গ্রস", "ক্যাশ-ইন", "ক্যাশ-আউট")
 
-            Row(modifier = Modifier.background(Color.White)) {
+            // মেইন হেডার রো — সবুজ, সাদা বোল্ড লেখা (পার্টি লেজার/ডিটেইলের মতো)
+            Row(modifier = Modifier.background(AggHeaderBg).height(34.dp)) {
                 headers.forEachIndexed { i, h ->
-                    Text(
-                        text = h,
-                        modifier = Modifier.width(colWidths[i]).padding(6.dp),
-                        fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Box(
+                        modifier = Modifier.width(colWidths[i]).fillMaxHeight().border(0.5.dp, AggHeaderGrid),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = h,
+                            modifier = Modifier.padding(horizontal = 6.dp),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
                 }
             }
 
             // চওড়া = কলামগুলোর যোগফল (অনুভূমিক স্ক্রলের ভেতরে অসীম প্রস্থ এড়াতে); সারি বেশি হলে ফুটার যেন নিচে থাকে
             LazyColumn(modifier = Modifier.width(colWidths.fold(0.dp) { acc, w -> acc + w }).weight(1f, fill = false)) {
                 // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
-                itemsIndexed(reports, key = { index, it -> "${it.id}_${it.ts}_$index" }) { _, report ->
+                itemsIndexed(reports, key = { index, it -> "${it.id}_${it.ts}_$index" }) { index, report ->
                     AggReportRow(
                         report = report,
+                        rowIndex = index,
                         colWidths = colWidths,
                         deleteMode = deleteMode,
                         onLongPress = { deleteMode = true },
@@ -141,18 +152,15 @@ fun AggregateReportOverlay(
                 }
             }
 
-            // ── ফুটার টোটাল ──
-            Row(modifier = Modifier.background(Color.White)) {
-                Text("সর্বমোট", modifier = Modifier.width(colWidths[0]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                Text(formatGaj(sumInStock), modifier = Modifier.width(colWidths[1]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                Text(formatGaj(sumOutStock), modifier = Modifier.width(colWidths[2]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    formatTaka(sumNet), modifier = Modifier.width(colWidths[3]).padding(6.dp), fontSize = 10.5.sp,
-                    fontWeight = FontWeight.Bold, color = if (sumNet >= 0) Color(0xFF2BB673) else Color(0xFFD9452B)
-                )
-                Text(formatTaka(sumGross), modifier = Modifier.width(colWidths[4]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                Text(formatTaka(sumIn), modifier = Modifier.width(colWidths[5]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
-                Text(formatTaka(sumOut), modifier = Modifier.width(colWidths[6]).padding(6.dp), fontSize = 10.5.sp, fontWeight = FontWeight.Bold)
+            // ── ফুটার টোটাল — গ্রিডের শেষ রো ──
+            Row(modifier = Modifier.background(Color(0xFFE9E4D4)).height(IntrinsicSize.Min)) {
+                AggCell("সর্বমোট", colWidths[0], bold = true, align = TextAlign.Start)
+                AggCell(formatGaj(sumInStock), colWidths[1], bold = true)
+                AggCell(formatGaj(sumOutStock), colWidths[2], bold = true)
+                AggCell(formatTaka(sumNet), colWidths[3], bold = true, color = if (sumNet >= 0) AggGreen else AggRed)
+                AggCell(formatTaka(sumGross), colWidths[4], bold = true)
+                AggCell(formatTaka(sumIn), colWidths[5], bold = true)
+                AggCell(formatTaka(sumOut), colWidths[6], bold = true)
             }
         }
 
@@ -176,35 +184,74 @@ fun AggregateReportOverlay(
     }
 }
 
+private val AggHeaderBg = Color(0xFF1E3A32)
+private val AggHeaderGrid = Color(0xFF3B5A50)
+private val AggGrid = Color(0xFFCFCBC0)
+private val AggGreen = Color(0xFF2BB673)
+private val AggRed = Color(0xFFD9452B)
+
+/** এক্সেল গ্রিডের একটা ঘর — বর্ডারসহ, রো-র সমান উচ্চতা */
+@Composable
+private fun AggCell(
+    text: String,
+    width: androidx.compose.ui.unit.Dp,
+    bold: Boolean = false,
+    color: Color = Color(0xFF141413),
+    align: TextAlign = TextAlign.Center
+) {
+    Box(
+        modifier = Modifier
+            .width(width)
+            .fillMaxHeight()
+            .border(0.5.dp, AggGrid)
+            .padding(horizontal = 6.dp, vertical = 8.dp),
+        contentAlignment = if (align == TextAlign.Start) Alignment.CenterStart else Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 11.sp,
+            fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
+            color = color,
+            textAlign = align
+        )
+    }
+}
+
 @Composable
 private fun AggReportRow(
     report: WeeklyReport,
+    rowIndex: Int,
     colWidths: List<androidx.compose.ui.unit.Dp>,
     deleteMode: Boolean,
     onLongPress: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val rowBg = if (rowIndex % 2 == 0) Color.White else Color(0xFFF7F5EF)
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(rowBg)
+            .height(IntrinsicSize.Min)
             .combinedClickable(onClick = {}, onLongClick = onLongPress),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (deleteMode) {
-            IconButton(onClick = onDelete, modifier = Modifier.width(colWidths[0])) {
-                Icon(Icons.Filled.Delete, contentDescription = "মুছুন", tint = Color(0xFFD9452B))
+            Box(
+                modifier = Modifier.width(colWidths[0]).fillMaxHeight().border(0.5.dp, AggGrid),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Filled.Delete, contentDescription = "মুছুন", tint = AggRed)
+                }
             }
         } else {
-            Text(report.label.ifBlank { "—" }, modifier = Modifier.width(colWidths[0]).padding(6.dp), fontSize = 11.sp)
+            AggCell(report.label.ifBlank { "—" }, colWidths[0], align = TextAlign.Start)
         }
-        Text(formatGaj(report.stockInYard), modifier = Modifier.width(colWidths[1]).padding(6.dp), fontSize = 11.sp)
-        Text(formatGaj(report.stockOutYard), modifier = Modifier.width(colWidths[2]).padding(6.dp), fontSize = 11.sp)
-        Text(
-            formatTaka(report.net), modifier = Modifier.width(colWidths[3]).padding(6.dp), fontSize = 11.sp,
-            color = if (report.net >= 0) Color(0xFF2BB673) else Color(0xFFD9452B)
-        )
-        Text(formatTaka(report.gross), modifier = Modifier.width(colWidths[4]).padding(6.dp), fontSize = 11.sp)
-        Text(formatTaka(report.cashIn), modifier = Modifier.width(colWidths[5]).padding(6.dp), fontSize = 11.sp)
-        Text(formatTaka(report.cashOut), modifier = Modifier.width(colWidths[6]).padding(6.dp), fontSize = 11.sp)
+        AggCell(formatGaj(report.stockInYard), colWidths[1])
+        AggCell(formatGaj(report.stockOutYard), colWidths[2])
+        AggCell(formatTaka(report.net), colWidths[3], color = if (report.net >= 0) AggGreen else AggRed)
+        AggCell(formatTaka(report.gross), colWidths[4])
+        AggCell(formatTaka(report.cashIn), colWidths[5])
+        AggCell(formatTaka(report.cashOut), colWidths[6])
     }
 }
