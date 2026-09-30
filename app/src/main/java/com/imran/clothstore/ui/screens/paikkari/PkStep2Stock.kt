@@ -41,20 +41,12 @@ fun PkStep2Stock(
     }
 
     Column {
-        SectionTitle("স্টক — Stock")
-        PkInputRow("ক্রয়কৃত গজ", "গজ", stockInYard, { stockInYard = it; sync() }, isDecimal = true)
-        PkInputRow("বিক্রিত গজ", "গজ", soldGaj, { soldGaj = it; sync() }, isDecimal = true)
-        PkInputRow("প্রতি গজে লাভ", "৳/গজ", profitGaj, { profitGaj = it; sync() }, isDecimal = true)
-
         val estProfit = soldGaj.toInputDouble() * profitGaj.toInputDouble()
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .background(Color.White, RoundedCornerShape(10.dp))
-                .padding(12.dp)
-        ) {
-            PkAutoRow("আনুমানিক মোট লাভ", formatTaka(estProfit))
+        PkSectionCard("স্টক — Stock", topPadding = 20.dp) {
+            PkInputRow("ক্রয়কৃত গজ", "গজ", stockInYard, { stockInYard = it; sync() }, isDecimal = true)
+            PkInputRow("বিক্রিত গজ", "গজ", soldGaj, { soldGaj = it; sync() }, isDecimal = true)
+            PkInputRow("প্রতি গজে লাভ", "৳/গজ", profitGaj, { profitGaj = it; sync() }, isDecimal = true)
+            PkAutoRow("আনুমানিক মোট লাভ", formatTaka(estProfit), last = true)
         }
     }
 }

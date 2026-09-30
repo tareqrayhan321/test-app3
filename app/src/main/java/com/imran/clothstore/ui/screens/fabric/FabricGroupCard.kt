@@ -55,7 +55,6 @@ fun FabricGroupCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
     ) {

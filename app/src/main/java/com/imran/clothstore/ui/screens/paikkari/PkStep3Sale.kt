@@ -47,27 +47,21 @@ fun PkStep3Sale(
     }
 
     Column {
-        SectionTitle("বিক্রয় — Sale")
-        PkInputRow("নগদ বিক্রয়", "৳", cashSale, { cashSale = it; sync() }, isDecimal = true)
-        PkInputRow("বাকি বিক্রয়", "৳", creditSale, { creditSale = it; sync() }, isDecimal = true)
-
-        SectionTitle("ক্রয় — Purchase", topPadding = 20.dp)
-        PkInputRow("নগদ ক্রয়", "৳", cashPurchase, { cashPurchase = it; sync() }, isDecimal = true)
-        PkInputRow("বাকি ক্রয়", "৳", creditPurchase, { creditPurchase = it; sync() }, isDecimal = true)
-
-        SectionTitle("আদায় ও দেনা", topPadding = 20.dp)
-        PkInputRow("পুরনো বাকি আদায়", "৳", oldCollection, { oldCollection = it; sync() }, isDecimal = true)
-        PkInputRow("পুরনো দেনা পরিশোধ", "৳", oldDebt, { oldDebt = it; sync() }, isDecimal = true)
-
         val totalSale = cashSale.toInputDouble() + creditSale.toInputDouble()
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .background(Color.White, RoundedCornerShape(10.dp))
-                .padding(12.dp)
-        ) {
-            PkAutoRow("মোট বিক্রি", formatTaka(totalSale))
+        PkSectionCard("বিক্রয় — Sale", topPadding = 20.dp) {
+            PkInputRow("নগদ বিক্রয়", "৳", cashSale, { cashSale = it; sync() }, isDecimal = true)
+            PkInputRow("বাকি বিক্রয়", "৳", creditSale, { creditSale = it; sync() }, isDecimal = true)
+            PkAutoRow("মোট বিক্রি", formatTaka(totalSale), last = true)
+        }
+
+        PkSectionCard("ক্রয় — Purchase", topPadding = 20.dp) {
+            PkInputRow("নগদ ক্রয়", "৳", cashPurchase, { cashPurchase = it; sync() }, isDecimal = true)
+            PkInputRow("বাকি ক্রয়", "৳", creditPurchase, { creditPurchase = it; sync() }, isDecimal = true, last = true)
+        }
+
+        PkSectionCard("আদায় ও দেনা", topPadding = 20.dp) {
+            PkInputRow("পুরনো বাকি আদায়", "৳", oldCollection, { oldCollection = it; sync() }, isDecimal = true)
+            PkInputRow("পুরনো দেনা পরিশোধ", "৳", oldDebt, { oldDebt = it; sync() }, isDecimal = true, last = true)
         }
     }
 }

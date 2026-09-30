@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
@@ -67,7 +68,7 @@ fun FabricScreen(
                     )
                 )
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 22.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 14.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -75,8 +76,8 @@ fun FabricScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("কাপড় ক্রয়", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                    Text(summaryText, color = Color.White.copy(alpha = 0.75f), fontSize = 11.5.sp)
+                    Text("কাপড় ক্রয়", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    Text(summaryText, color = Color.White.copy(alpha = 0.75f), fontSize = 10.5.sp)
                 }
                 IconButton(onClick = { showNewForm = !showNewForm }) {
                     Icon(Icons.Filled.Add, contentDescription = "নতুন এন্ট্রি", tint = Color.White)
@@ -84,19 +85,16 @@ fun FabricScreen(
             }
 
             if (groups.isNotEmpty()) {
-                OutlinedTextField(
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                com.imran.clothstore.ui.components.CompactTextField(
                     value = query,
                     onValueChange = viewModel::onSearchChange,
-                    placeholder = { Text("কাপড়ের নাম খুঁজুন...") },
-                    singleLine = true,
+                    placeholder = "কাপড়ের নাম খুঁজুন...",
+                    fieldHeight = 42.dp,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    fontSize = 14.sp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
-                    )
+                        .padding(top = 8.dp)
                 )
             }
         }
@@ -137,7 +135,17 @@ fun FabricScreen(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)
             ) {
-                itemsIndexed(groups, key = { index, it -> "${it.id}_$index" }) { _, group ->
+                itemsIndexed(groups, key = { index, it -> "${it.id}_$index" }) { index, group ->
+                    // আইটেমগুলোর মাঝে হালকা ডিভাইডার (প্রথম আইটেমের উপরে নয়)
+                    if (index > 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp)
+                                .height(1.dp)
+                                .background(Color(0xFFEAE5D6))
+                        )
+                    }
                     FabricGroupCard(
                         group = group,
                         onAddMore = { qty, rate, onError ->

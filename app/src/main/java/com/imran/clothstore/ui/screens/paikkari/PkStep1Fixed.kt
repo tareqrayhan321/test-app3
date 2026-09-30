@@ -57,19 +57,21 @@ fun PkStep1Fixed(
     }
 
     Column {
-        SectionTitle("স্থায়ী খরচ — Fixed Costs")
-        PkInputRow("বাৎসরিক ভাড়া", "৳/বছর", yearlyRent, { yearlyRent = it; sync() }, isDecimal = true)
-        PkInputRow("মাসিক বিদ্যুৎ", "৳/মাস", monthlyElec, { monthlyElec = it; sync() }, isDecimal = true)
-        PkInputRow("মাসিক ওয়াইফাই", "৳/মাস", monthlyWifi, { monthlyWifi = it; sync() }, isDecimal = true)
-        PkInputRow("সাপ্তাহিক মাঠ ভাড়া", "৳/সপ্তাহ", weeklyMath, { weeklyMath = it; sync() }, isDecimal = true)
-        PkInputRow("সাপ্তাহিক টয়লেট", "৳/সপ্তাহ", weeklyToilet, { weeklyToilet = it; sync() }, isDecimal = true)
+        PkSectionCard("স্থায়ী খরচ — Fixed Costs") {
+            PkInputRow("বাৎসরিক ভাড়া", "৳/বছর", yearlyRent, { yearlyRent = it; sync() }, isDecimal = true)
+            PkInputRow("মাসিক বিদ্যুৎ", "৳/মাস", monthlyElec, { monthlyElec = it; sync() }, isDecimal = true)
+            PkInputRow("মাসিক ওয়াইফাই", "৳/মাস", monthlyWifi, { monthlyWifi = it; sync() }, isDecimal = true)
+            PkInputRow("সাপ্তাহিক মাঠ ভাড়া", "৳/সপ্তাহ", weeklyMath, { weeklyMath = it; sync() }, isDecimal = true)
+            PkInputRow("সাপ্তাহিক টয়লেট", "৳/সপ্তাহ", weeklyToilet, { weeklyToilet = it; sync() }, isDecimal = true, last = true)
+        }
 
-        SectionTitle("রক্ষণাবেক্ষণ খরচ — Maintenance Costs", topPadding = 20.dp)
-        PkInputRow("কর্মচারী বেতন", "৳", salary, { salary = it; sync() }, isDecimal = true)
-        PkInputRow("মালিকের বেতন", "৳", ownerSalary, { ownerSalary = it; sync() }, isDecimal = true)
-        PkInputRow("যাতায়াত খরচ", "৳", transport, { transport = it; sync() }, isDecimal = true)
-        PkInputRow("যানবাহন খরচ", "৳", vehicle, { vehicle = it; sync() }, isDecimal = true)
-        PkInputRow("বিবিধ খরচ", "৳", misc, { misc = it; sync() }, isDecimal = true)
+        PkSectionCard("রক্ষণাবেক্ষণ খরচ — Maintenance Costs", topPadding = 20.dp) {
+            PkInputRow("কর্মচারী বেতন", "৳", salary, { salary = it; sync() }, isDecimal = true)
+            PkInputRow("মালিকের বেতন", "৳", ownerSalary, { ownerSalary = it; sync() }, isDecimal = true)
+            PkInputRow("যাতায়াত খরচ", "৳", transport, { transport = it; sync() }, isDecimal = true)
+            PkInputRow("যানবাহন খরচ", "৳", vehicle, { vehicle = it; sync() }, isDecimal = true)
+            PkInputRow("বিবিধ খরচ", "৳", misc, { misc = it; sync() }, isDecimal = true, last = true)
+        }
 
         // ── সাপ্তাহিক স্থায়ী খরচের স্বয়ংক্রিয় ব্রেকডাউন (weeklyFixed()) ──
         val f = computeWeeklyFixed(
@@ -81,18 +83,11 @@ fun PkStep1Fixed(
                 weeklyToilet = weeklyToilet.toInputDouble()
             )
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .background(Color.White, RoundedCornerShape(10.dp))
-                .padding(12.dp)
-        ) {
-            Text("সাপ্তাহিক স্থায়ী খরচ (স্বয়ংক্রিয়)", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6C6A64))
+        PkSectionCard("সাপ্তাহিক স্থায়ী খরচ (স্বয়ংক্রিয়)", topPadding = 20.dp) {
             PkAutoRow("ভাড়া/সপ্তাহ", formatTaka(f.wRent))
             PkAutoRow("বিদ্যুৎ/সপ্তাহ", formatTaka(f.wElec))
             PkAutoRow("ওয়াইফাই/সপ্তাহ", formatTaka(f.wWifi))
-            PkAutoRow("মোট (যাকাত ছাড়া)", formatTaka(f.totalExcludingZakat))
+            PkAutoRow("মোট (যাকাত ছাড়া)", formatTaka(f.totalExcludingZakat), last = true)
         }
     }
 }
