@@ -747,11 +747,11 @@ fun ReportArt(modifier: Modifier = Modifier) {
 }
 
 
-/** কার্ড ৯: ডাটাবেইজ — Material Symbols "database_upload" */
+/** কার্ড ৯: ডাটাবেইজ — Material Symbols "database" */
 @Composable
 fun DatabaseArt(modifier: Modifier = Modifier) {
     Image(
-        painter = painterResource(id = R.drawable.ic_database_upload),
+        painter = painterResource(id = R.drawable.ic_database),
         contentDescription = null,
         modifier = modifier.size(56.dp),
         colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color(0xFF3B82F6))

@@ -97,7 +97,9 @@ fun MiniArtCard(
     modifier: Modifier = Modifier,
     labelColor: Color = AppColors.TextPrimary,
     subtitle: String? = null,
-    cardHeight: androidx.compose.ui.unit.Dp = 140.dp
+    cardHeight: androidx.compose.ui.unit.Dp = 140.dp,
+    /** null হলে আগের মতো মাঝ-বরাবর। দিলে আইকন উপর থেকে নির্দিষ্ট দূরত্বে বসে — টেক্সট কয় লাইন হলো তাতে আইকনের অবস্থান বদলায় না */
+    iconTopPadding: androidx.compose.ui.unit.Dp? = null
 ) {
     Box(
         modifier = modifier
@@ -113,9 +115,10 @@ fun MiniArtCard(
                 .fillMaxSize()
                 .padding(horizontal = 6.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+            verticalArrangement = if (iconTopPadding != null) androidx.compose.foundation.layout.Arrangement.Top
+                else androidx.compose.foundation.layout.Arrangement.Center
         ) {
-            Box(modifier = Modifier.size(64.dp), contentAlignment = Alignment.Center) { art() }
+            Box(modifier = Modifier.padding(top = iconTopPadding ?: 0.dp).size(64.dp), contentAlignment = Alignment.Center) { art() }
             Text(
                 text = title,
                 fontSize = 13.sp,
