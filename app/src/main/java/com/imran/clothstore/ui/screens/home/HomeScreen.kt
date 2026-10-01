@@ -150,7 +150,8 @@ fun HomeScreen(
                     onClick = { onCardClick(EntryCategory.IRREGULAR_CUSTOMER) },
                     art = { CustomerIrregularArt() },
                     labelColor = AppColors.TextPrimary,
-                    cardHeight = 172.dp
+                    cardHeight = 172.dp,
+                    iconTopPadding = 14.5.dp
                 )
             }
             item {
@@ -190,7 +191,8 @@ fun HomeScreen(
                     onClick = onDbConnectClick,
                     art = { DatabaseArt() },
                     labelColor = AppColors.TextPrimary,
-                    cardHeight = 172.dp
+                    cardHeight = 172.dp,
+                    iconTopPadding = 14.5.dp
                 )
             }
         }
