@@ -161,7 +161,9 @@ fun HomeScreen(
                     onClick = onPartyClick,
                     art = { PartyArt() },
                     labelColor = AppColors.TextPrimary,
-                    cardHeight = 172.dp
+                    cardHeight = 172.dp,
+                    // Party-র "groups" আইকনের গ্লিফ পাশের আইকনের চেয়ে ছোট — নিচের কিনারা মেলাতে ৪dp বাড়তি
+                    iconTopPadding = 18.5.dp
                 )
             }
             item {
