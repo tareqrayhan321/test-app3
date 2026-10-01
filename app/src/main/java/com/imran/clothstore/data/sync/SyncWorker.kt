@@ -88,6 +88,7 @@ class SyncWorker(
             // pull-এর ফলাফল (অন্য ডিভাইসের পরিবর্তনসহ) Room-এ প্রতিফলিত করা, pendingSync ক্লিয়ার করা
             local.save(merged, markPendingSync = false)
             Log.i(TAG, "Room backup cache refreshed successfully")
+            SyncStatus.markSynced(applicationContext)
 
             Result.success()
         } catch (e: Exception) {

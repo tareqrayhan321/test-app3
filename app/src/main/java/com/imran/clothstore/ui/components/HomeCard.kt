@@ -128,7 +128,7 @@ fun MiniArtCard(
                 Text(
                     text = subtitle,
                     fontSize = 9.sp,
-                    maxLines = 2,
+                    maxLines = 3,
                     lineHeight = 12.sp,
                     color = Color(0xFF3D3B36),
                     textAlign = TextAlign.Center,

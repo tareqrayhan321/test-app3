@@ -2,13 +2,16 @@ package com.imran.clothstore.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
@@ -38,32 +41,40 @@ fun BottomNavBar(
     onSelect: (BottomNavTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // ভাসমান (floating) পিল-আকৃতির বার — স্ক্রিনের কিনারা থেকে ফাঁক রেখে, গোলাকার কোণসহ।
-    // ব্যাকগ্রাউন্ড আধা-স্বচ্ছ (alpha) রাখা হয়েছে যাতে নিচের কার্ড ঝাপসা হলেও দেখা যায়।
-    // এই বার কনটেন্টের উপরে overlay হয় (দেখুন MainActivity.kt), তাই স্বচ্ছতা কার্যকর।
+    // ভাসমান পিল বার — পার্টি ডিটেইলের জোড়া "জমা | পাওনা" বাটনের মতো: আধা-স্বচ্ছ সাদা ব্যাকগ্রাউন্ড,
+    // হালকা বর্ডার, হালকা শ্যাডো, মাঝে হালকা ডিভাইডার। কনটেন্টের উপরে overlay হয় (MainActivity.kt)।
     Row(
         modifier = modifier
             .navigationBarsPadding()
             .padding(horizontal = 96.dp, vertical = 12.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
-            .background(Color.White.copy(alpha = 0.96f))
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .shadow(8.dp, CircleShape)
+            .clip(CircleShape)
+            .background(Color.White.copy(alpha = 0.82f))
+            .border(1.dp, Color(0xFFD9D2C0), CircleShape),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         BottomNavItem(
             label = "Dashboard",
             selectedIcon = Icons.Filled.GridView,
             unselectedIcon = Icons.Outlined.GridView,
             isSelected = selected == BottomNavTab.DASHBOARD,
-            onClick = { onSelect(BottomNavTab.DASHBOARD) }
+            onClick = { onSelect(BottomNavTab.DASHBOARD) },
+            modifier = Modifier.weight(1f)
+        )
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .height(30.dp)
+                .background(Color(0xFFD9D2C0))
         )
         BottomNavItem(
             label = "Home",
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             isSelected = selected == BottomNavTab.HOME,
-            onClick = { onSelect(BottomNavTab.HOME) }
+            onClick = { onSelect(BottomNavTab.HOME) },
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -74,13 +85,17 @@ private fun BottomNavItem(
     selectedIcon: androidx.compose.ui.graphics.vector.ImageVector,
     unselectedIcon: androidx.compose.ui.graphics.vector.ImageVector,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val activeColor = Color(0xFFD4520F) // ওয়েব রেফারেন্সে সক্রিয় ট্যাবের কমলা রং (আরো গাঢ়)
     val inactiveColor = Color(0xFF4A4A45)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
+        modifier = modifier
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp)
     ) {
         Icon(
             imageVector = selectedIcon,

@@ -69,6 +69,7 @@ fun HomeScreen(
 ) {
     val hasUnread by notifViewModel.hasUnread.collectAsState()
     val summaries by viewModel.summaries.collectAsState()
+    val dbSubtitle by viewModel.dbSubtitle.collectAsState()
 
     // মিনি-কার্ডের উচ্চতা (140dp) এর প্রায় অর্ধেক হেডারের ভেতরে, বাকি অর্ধেক বডিতে
     val overlap = HeaderCardOverlap
@@ -155,6 +156,7 @@ fun HomeScreen(
             item {
                 MiniArtCard(
                     title = "Party",
+                    subtitle = viewModel.formatSummary(EntryCategory.PARTY, summaries),
                     onClick = onPartyClick,
                     art = { PartyArt() },
                     labelColor = AppColors.TextPrimary,
@@ -184,6 +186,7 @@ fun HomeScreen(
             item {
                 MiniArtCard(
                     title = "Database",
+                    subtitle = dbSubtitle,
                     onClick = onDbConnectClick,
                     art = { DatabaseArt() },
                     labelColor = AppColors.TextPrimary,

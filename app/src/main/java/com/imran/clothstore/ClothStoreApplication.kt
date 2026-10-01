@@ -7,6 +7,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.imran.clothstore.data.backup.BackupRepository
 import com.imran.clothstore.data.local.AppDatabase
 import com.imran.clothstore.data.local.LocalCacheRepository
+import com.imran.clothstore.data.sync.SyncStatus
 import com.imran.clothstore.data.sync.SyncWorker
 import com.imran.clothstore.ui.screens.notif.NotificationCenter
 
@@ -71,10 +72,15 @@ class ClothStoreApplication : Application() {
             backupListener?.remove()
             backupListener = BackupRepository().addRemoteSnapshotListener(
                 onChange = { _ -> SyncWorker.triggerImmediate(applicationContext) },
-                onError = { error -> Log.e(TAG, "Firestore backup listener failed", error) }
+                onError = { error ->
+                    Log.e(TAG, "Firestore backup listener failed", error)
+                    SyncStatus.setRealtimeActive(false)
+                }
             )
+            SyncStatus.setRealtimeActive(true)
         } catch (e: Exception) {
             Log.e(TAG, "Could not start Firestore backup listener", e)
+            SyncStatus.setRealtimeActive(false)
         }
     }
 
