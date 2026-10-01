@@ -19,6 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -126,67 +131,80 @@ fun DetailScreen(
                 .background(Color(0xFFE2D9C4))
         )
 
-        // ── টেবিল (স্ক্রলযোগ্য) ──
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-            TransactionTable(rows = rows, onRowLongPress = { actionRow = it })
-        }
-
-        // ── স্টিকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if (category.isCustomerType) "বর্তমান পাওনা/প্রাপ্য" else "বর্তমান বকেয়া",
-                fontSize = 14.sp,
-                color = AppColors.TextPrimary
-            )
-            Text(
-                text = formatTaka(entry.baki),
-                fontSize = 19.sp,
-                fontWeight = FontWeight.Bold,
-                color = AppColors.TextPrimary,
-                modifier = Modifier.padding(start = 12.dp)
-            )
-        }
-
-        // ── দুই বড় বাটন: জমা এন্ট্রি (সবুজ) | পাওনা এন্ট্রি (লাল) ──
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .navigationBarsPadding()
-                .padding(horizontal = 12.dp)
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Button(
-                onClick = { formKind = "joma" },
-                modifier = Modifier.weight(1f).height(42.dp),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1F9D55))
-            ) {
-                Text("💰 জমা এন্ট্রি", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false)
-            }
-            Button(
-                onClick = { formKind = "bokeyoa" },
-                modifier = Modifier.weight(1f).height(42.dp),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828))
-            ) {
-                Text(
-                    if (category.isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
-                    fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, softWrap = false
+        // ── টেবিল (হেডার সারি স্থির, ২য় সারি থেকে স্ক্রল) + ফুটার + ভাসমান বাটন ──
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        var footerHeight by remember { mutableStateOf(0.dp) }
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                TransactionTable(
+                    rows = rows,
+                    onRowLongPress = { actionRow = it },
+                    modifier = Modifier.weight(1f),
+                    bottomPadding = 64.dp // শেষ রো যেন ভাসমান বাটনের নিচে আটকে না থাকে
                 )
+
+                // ── স্টিকি ফুটার: বর্তমান পাওনা/প্রাপ্য ──
+                Row(
+                    modifier = Modifier
+                        .onSizeChanged { footerHeight = with(density) { it.height.toDp() } }
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .navigationBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (category.isCustomerType) "বর্তমান পাওনা/প্রাপ্য" else "বর্তমান বকেয়া",
+                        fontSize = 14.sp,
+                        color = AppColors.TextPrimary
+                    )
+                    Text(
+                        text = formatTaka(entry.baki),
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+            }
+
+            // ── ভাসমান জোড়া বাটন: জমা এন্ট্রি | মাঝে ডিভাইডার | পাওনা এন্ট্রি ──
+            // হালকা (আধা-স্বচ্ছ) ব্যাকগ্রাউন্ড, তাই নিচের টেবিলের লেখা আবছা দেখা যায়।
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = footerHeight + 10.dp)
+                    .shadow(8.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.82f))
+                    .border(1.dp, Color(0xFFD9D2C0), CircleShape),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clickable { formKind = "joma" }
+                        .padding(horizontal = 22.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("জমা এন্ট্রি", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1F9D55), maxLines = 1, softWrap = false)
+                }
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(20.dp)
+                        .background(Color(0xFFD9D2C0))
+                )
+                Box(
+                    modifier = Modifier
+                        .clickable { formKind = "bokeyoa" }
+                        .padding(horizontal = 22.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        if (category.isCustomerType) "পাওনা এন্ট্রি" else "বকেয়া এন্ট্রি",
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC62828), maxLines = 1, softWrap = false
+                    )
+                }
             }
         }
     }
@@ -212,13 +230,13 @@ fun DetailScreen(
                         modifier = Modifier.fillMaxWidth().padding(top = 14.dp).height(44.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal)
-                    ) { Text("✏️ এডিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                    ) { Text("এডিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
                     Button(
                         onClick = { deletingRow = row; actionRow = null },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(44.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC62828))
-                    ) { Text("🗑️ ডিলিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                    ) { Text("ডিলিট", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
                 }
             },
             confirmButton = {},

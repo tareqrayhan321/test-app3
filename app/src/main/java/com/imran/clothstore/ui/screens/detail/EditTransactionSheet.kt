@@ -71,7 +71,7 @@ fun EditTransactionSheet(
                 .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
         ) {
             Text(
-                text = if (isJoma) "✏️ জমা এডিট" else if (isCustomerType) "✏️ পাওনা এডিট" else "✏️ বকেয়া এডিট",
+                text = if (isJoma) "জমা এডিট" else if (isCustomerType) "পাওনা এডিট" else "বকেয়া এডিট",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
@@ -90,8 +90,8 @@ fun EditTransactionSheet(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
                         AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
+                        AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
                     }
                     Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         AppTextField(
@@ -100,7 +100,7 @@ fun EditTransactionSheet(
                             Modifier.weight(1f), KeyboardType.Decimal
                         )
                         if (!isJoma) {
-                            AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f))
+                            AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f), KeyboardType.Decimal)
                         } else {
                             AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
                         }

@@ -35,7 +35,7 @@ import com.imran.clothstore.ui.theme.AppColors
 
 /**
  * ওয়েব অ্যাপের dmf-bokeyoa-/dmf-joma- মিনি ফর্মের সমতুল্য — এখন Detail স্ক্রিনের নিচের
- * "💰 জমা এন্ট্রি" / "📝 পাওনা এন্ট্রি" বাটন থেকে বটম-শিটে খোলে (আগে ইনলাইন টগল ছিল)।
+ * "জমা এন্ট্রি" / "পাওনা এন্ট্রি" বাটন থেকে বটম-শিটে খোলে (আগে ইনলাইন টগল ছিল)।
  * ফর্ম-শিটের নিজস্ব রেফারেন্স স্ক্রিনশট পাওয়া যায়নি; স্টাইল অন্য ফর্মের (ক্রিম প্যানেল) সাথে মেলানো।
  */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -60,7 +60,7 @@ fun TransactionFormSheet(
                 .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
         ) {
             Text(
-                text = if (kind == "joma") "💰 জমা এন্ট্রি" else if (isCustomerType) "📝 পাওনা এন্ট্রি" else "📝 বকেয়া এন্ট্রি",
+                text = if (kind == "joma") "জমা এন্ট্রি" else if (isCustomerType) "পাওনা এন্ট্রি" else "বকেয়া এন্ট্রি",
                 fontSize = 17.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
@@ -106,12 +106,12 @@ private fun ColumnScope.BokeyoaMiniForm(
                 .verticalScroll(rememberScrollState())
         ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
+            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(bill, { bill = it }, "বিল/বকেয়া", Modifier.weight(1f), KeyboardType.Decimal)
-            AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f))
+            AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f), KeyboardType.Decimal)
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(joma, { joma = it }, "সাথে জমা (ঐচ্ছিক)", Modifier.weight(1f), KeyboardType.Decimal)
@@ -152,8 +152,8 @@ private fun ColumnScope.JomaMiniForm(
                 .verticalScroll(rememberScrollState())
         ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
+            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)

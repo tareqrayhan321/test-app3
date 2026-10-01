@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.verticalScroll
 import com.imran.clothstore.util.formatTaka
 import com.imran.clothstore.util.toBengaliDigits
 
@@ -32,7 +33,12 @@ import com.imran.clothstore.util.toBengaliDigits
  * কলাম: তারিখ | ম্যামো | পাওনা/প্রাপ্য | জমা | মোট বাকি | গজ | মন্তব্য — অনুভূমিক স্ক্রলযোগ্য।
  */
 @Composable
-fun TransactionTable(rows: List<TxnRow>, onRowLongPress: (TxnRow) -> Unit = {}) {
+fun TransactionTable(
+    rows: List<TxnRow>,
+    onRowLongPress: (TxnRow) -> Unit = {},
+    modifier: Modifier = Modifier,
+    bottomPadding: androidx.compose.ui.unit.Dp = 0.dp
+) {
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val colWidths = listOf(96.dp, 72.dp, 116.dp, 100.dp, 108.dp, 76.dp, 200.dp)
     val headers = listOf("তারিখ", "ম্যামো", "পাওনা/প্রাপ্য", "জমা", "মোট বাকি", "গজ", "মন্তব্য")
@@ -44,8 +50,11 @@ fun TransactionTable(rows: List<TxnRow>, onRowLongPress: (TxnRow) -> Unit = {}) 
     val redNum = Color(0xFFD9452B)
     val greenNum = Color(0xFF2BB673)
 
-    Column(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-        Row(modifier = Modifier.background(headerBg).height(HEADER_H)) {
+    // হেডার সারি স্থির; বডি উল্লম্বে স্ক্রল হয়। দুটোর অনুভূমিক স্ক্রল একই state-এ বাঁধা — একসাথে সরে।
+    val hScroll = rememberScrollState()
+    val vScroll = rememberScrollState()
+    Column(modifier = modifier) {
+        Row(modifier = Modifier.horizontalScroll(hScroll).background(headerBg).height(HEADER_H)) {
             headers.forEachIndexed { i, h ->
                 Box(
                     modifier = Modifier
@@ -68,6 +77,8 @@ fun TransactionTable(rows: List<TxnRow>, onRowLongPress: (TxnRow) -> Unit = {}) 
             }
         }
 
+        Column(modifier = Modifier.weight(1f).verticalScroll(vScroll)) {
+        Column(modifier = Modifier.horizontalScroll(hScroll)) {
         if (rows.isEmpty()) {
             Text(
                 text = "কোনো লেনদেন নেই",
@@ -115,6 +126,9 @@ fun TransactionTable(rows: List<TxnRow>, onRowLongPress: (TxnRow) -> Unit = {}) 
                 Cell(row.goj.ifBlank { "—" }.toBengaliDigits(), colWidths[5], grid, TextAlign.Center)
                 Cell(row.note.ifBlank { "" }, colWidths[6], grid, TextAlign.Start)
             }
+        }
+        }
+        androidx.compose.foundation.layout.Spacer(Modifier.height(bottomPadding))
         }
     }
 }

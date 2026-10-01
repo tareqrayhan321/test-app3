@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * ওয়েব অ্যাপের notifOverlay (notif-panel) এর সরাসরি Kotlin/Compose সংস্করণ।
- * ফুল-স্ক্রিন ওভারলে হিসেবে খোলে — আইকনসহ (success ✅ / error ⚠️ / info ☁️) নোটিফিকেশন লিস্ট।
+ * ফুল-স্ক্রিন ওভারলে হিসেবে খোলে — আইকনসহ (success / error / info) নোটিফিকেশন লিস্ট।
  */
 @Composable
 fun NotificationPanel(

@@ -37,7 +37,7 @@ fun SecretKeyDialog(
     message: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    title: String = "🔒 সিক্রেট কী",
+    title: String = "সিক্রেট কী",
     confirmLabel: String = "নিশ্চিত করুন"
 ) {
     var input by remember { mutableStateOf("") }

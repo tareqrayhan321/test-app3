@@ -205,7 +205,7 @@ fun EntryFormDialog(
                 // ── জমা | গজ ──
                 Row(Modifier.padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
-                    AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f))
+                    AppTextField(goj, { goj = it }, "গজ", Modifier.weight(1f), KeyboardType.Decimal)
                 }
 
                 // ── মন্তব্য (পুরো প্রস্থ) ──
