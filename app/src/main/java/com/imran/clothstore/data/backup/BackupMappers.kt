@@ -66,7 +66,10 @@ fun BackupPayload.entriesFor(category: EntryCategory): List<Entry> = when (categ
     "is_c3_list" -> is_c3_list
     "is_c4_list" -> is_c4_list
     else -> emptyList()
-}.map { it.toEntry() }
+}.map { be ->
+    val e = be.toEntry()
+    e.copy(baki = com.imran.clothstore.ui.screens.detail.currentBaki(e, category.isCustomerType))
+}
 
 fun BackupPayload.fabricGroups(): List<FabricGroup> = fabricPurchaseData_v2.map { it.toFabricGroup() }
 
