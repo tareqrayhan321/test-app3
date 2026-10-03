@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.padding
@@ -35,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -65,12 +65,24 @@ fun AggregateReportOverlay(
         reports.groupBy { monthKeyOf(it) }
             .entries.sortedByDescending { it.key.first * 12 + it.key.second }
     }
+    // মাসের ব্যান্ডের রঙ: ৫টা রঙ ঘুরে ঘুরে, পাশাপাশি দুটো একই রঙ হবে না
+    val monthThemeIdx = remember(months) {
+        val result = ArrayList<Int>()
+        months.forEach { (key, _) ->
+            var idx = (key.first * 12 + key.second) % MonthThemes.size
+            if (result.isNotEmpty() && result.last() == idx) idx = (idx + 1) % MonthThemes.size
+            result.add(idx)
+        }
+        result
+    }
 
     // পার্টি লেজারের কাঠামো: সাদা সমান হেডার (স্ট্যাটাস বারের নিচে) → সমান বডি → এক্সেল গ্রিড টেবিল
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .navigationBarsPadding()
+            .padding(bottom = 12.dp)
     ) {
         // ── হেডার — সাদা, সমান (গোলাকার নয়) ──
         Row(
@@ -125,8 +137,8 @@ fun AggregateReportOverlay(
 
             // প্রতিটা মাসের টেবিল: ডিভাইডার ব্যান্ড → সবুজ হেডার → সপ্তাহের সারি → মাসের মোট
             LazyColumn(modifier = Modifier.width(tableWidth).weight(1f, fill = false)) {
-                months.forEach { (key, monthReports) ->
-                    val theme = monthTheme(key.second)
+                months.forEachIndexed { mIdx, (key, monthReports) ->
+                    val theme = MonthThemes[monthThemeIdx[mIdx]]
                     item(key = "month_${key.first}_${key.second}") {
                         Column {
                             // ডিভাইডার — এক মাসের টেবিল থেকে আরেক মাসের টেবিল আলাদা করে
@@ -155,7 +167,7 @@ fun AggregateReportOverlay(
                                     color = Color(0xFF6C6A64)
                                 )
                             }
-                            AggHeaderRow(headers, colWidths, theme.dark, lerp(theme.dark, Color.White, 0.25f))
+                            AggHeaderRow(headers, colWidths, AggHeaderBg, AggHeaderGrid)
                         }
                     }
                     // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
@@ -330,25 +342,16 @@ private fun AggTotalRow(
     }
 }
 
-/** প্রতি মাসের নিজস্ব রঙ — dark = টেবিল হেডার/মাসের নাম, light = মাসের ব্যান্ড। ১২ মাস ১২ রকম, নরম ও চোখে আরামদায়ক */
+/** মাসের নাম লেখা ব্যান্ডের রঙ — dark = মাসের নাম, light = ব্যান্ডের ব্যাকগ্রাউন্ড। ৫টা নরম রঙ */
 private class MonthTheme(val dark: Color, val light: Color)
 
 private val MonthThemes = listOf(
-    MonthTheme(Color(0xFF2F4A6D), Color(0xFFE4EBF4)), // জানুয়ারি — নীলচে স্লেট
-    MonthTheme(Color(0xFF5B3A6B), Color(0xFFEEE5F2)), // ফেব্রুয়ারি — বেগুনি
-    MonthTheme(Color(0xFF1E5F6B), Color(0xFFE0EFF1)), // মার্চ — টিল
-    MonthTheme(Color(0xFF2F6B3A), Color(0xFFE5F1E7)), // এপ্রিল — সবুজ
-    MonthTheme(Color(0xFF5E6B2A), Color(0xFFEEF1DE)), // মে — জলপাই
-    MonthTheme(Color(0xFF8A5A14), Color(0xFFF6EBD8)), // জুন — অ্যাম্বার
-    MonthTheme(Color(0xFF9A4A2E), Color(0xFFF6E6DF)), // জুলাই — টেরাকোটা
-    MonthTheme(Color(0xFF9A3B57), Color(0xFFF5E3E8)), // আগস্ট — গোলাপি-মেরুন
-    MonthTheme(Color(0xFF1E3A32), Color(0xFFE3EDE8)), // সেপ্টেম্বর — গাঢ় সবুজ (আগের রঙ)
-    MonthTheme(Color(0xFF3F3F8F), Color(0xFFE7E7F5)), // অক্টোবর — ইন্ডিগো
-    MonthTheme(Color(0xFF5A4636), Color(0xFFEDE6E0)), // নভেম্বর — কোকো
-    MonthTheme(Color(0xFF4A5568), Color(0xFFE8EAEE))  // ডিসেম্বর — গ্রাফাইট
+    MonthTheme(Color(0xFF1E3A32), Color(0xFFE3EDE8)), // সবুজাভ
+    MonthTheme(Color(0xFF2F4A6D), Color(0xFFE4EBF4)), // নীলচে
+    MonthTheme(Color(0xFF5B3A6B), Color(0xFFEEE5F2)), // হালকা বেগুনি
+    MonthTheme(Color(0xFF9A4A2E), Color(0xFFF6E6DF)), // পীচ
+    MonthTheme(Color(0xFF8A5A14), Color(0xFFF6EBD8))  // বালুরঙ
 )
-
-private fun monthTheme(month: Int): MonthTheme = MonthThemes[month.coerceIn(0, 11)]
 
 private val BnMonths = listOf(
     "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
