@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.draw.clip
@@ -36,7 +39,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,6 +64,10 @@ fun AggregateReportOverlay(
 ) {
     val reports by viewModel.reportsNewestFirst.collectAsState()
     var deleteMode by remember { mutableStateOf(false) }
+
+    // নেভিগেশন বাটন (৩-বাটন) থাকলে ইনসেট বড় → একটু বাড়তি ফাঁকা; জেসচার নেভিগেশনে ইনসেট ছোট → পেইজ নিচে নেমে আসে
+    val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val navExtra = if (navInset > 32.dp) 12.dp else 0.dp
 
 
     // প্রতিটা মাস আলাদা টেবিল — নতুন মাস আগে, প্রতি মাসের ভেতরে নতুন সপ্তাহ আগে
@@ -82,7 +92,7 @@ fun AggregateReportOverlay(
             .fillMaxSize()
             .background(Color.White)
             .navigationBarsPadding()
-            .padding(bottom = 12.dp)
+            .padding(bottom = navExtra)
     ) {
         // ── হেডার — সাদা, সমান (গোলাকার নয়) ──
         Row(
@@ -128,11 +138,12 @@ fun AggregateReportOverlay(
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 108.dp, 88.dp, 88.dp, 88.dp, 92.dp)
             val headers = listOf(
                 "সপ্তাহ", "ইন-স্টক", "ক্রয় মূল্য", "আউট-স্টক", "নগদ বিক্রি", "বাকি বিক্রি",
                 "পার্টি আমদানি", "নেট", "গ্রস", "ইন-ফ্লো", "আউট-ফ্লো"
             )
+            // প্রতিটা কলামের চওড়া = ওই কলামের সবচেয়ে লম্বা লেখা (বোল্ড ধরে) + প্যাডিং — লেখা কখনো ২য় লাইনে যাবে না
+            val colWidths = rememberColWidths(headers, months.flatMap { it.value }, reports)
             val tableWidth = colWidths.fold(0.dp) { acc, w -> acc + w }
 
             // প্রতিটা মাসের টেবিল: ডিভাইডার ব্যান্ড → সবুজ হেডার → সপ্তাহের সারি → মাসের মোট
@@ -243,7 +254,9 @@ private fun AggCell(
             fontSize = 11.sp,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
             color = color,
-            textAlign = align
+            textAlign = align,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
@@ -318,6 +331,20 @@ private fun sumKnown(list: List<WeeklyReport>, pick: (AggVals) -> Double?): Stri
     return if (xs.isEmpty()) "—" else formatTaka(xs.sum())
 }
 
+/** মাসের মোট / সর্বমোট রো-এর ১০টা ঘরের লেখা (সপ্তাহ কলাম বাদে) */
+private fun totalCells(list: List<WeeklyReport>): List<String> = listOf(
+    formatGaj(list.sumOf { it.stockInYard }),
+    sumKnown(list) { it.purchase },
+    formatGaj(list.sumOf { it.stockOutYard }),
+    sumKnown(list) { it.cashSale },
+    sumKnown(list) { it.creditSale },
+    sumKnown(list) { it.partyIncome },
+    formatTaka(list.sumOf { it.net }),
+    formatTaka(list.sumOf { it.gross }),
+    formatTaka(list.sumOf { it.cashIn }),
+    formatTaka(list.sumOf { it.cashOut })
+)
+
 /** মাসের মোট / সর্বমোট রো — কলামের ক্রম রো-এর মতোই */
 @Composable
 private fun AggTotalRow(
@@ -327,18 +354,49 @@ private fun AggTotalRow(
     bg: Color
 ) {
     val net = list.sumOf { it.net }
+    val cells = totalCells(list)
     Row(modifier = Modifier.background(bg).height(IntrinsicSize.Min)) {
         AggCell(title, colWidths[0], bold = true, align = TextAlign.Start)
-        AggCell(formatGaj(list.sumOf { it.stockInYard }), colWidths[1], bold = true)
-        AggCell(sumKnown(list) { it.purchase }, colWidths[2], bold = true)
-        AggCell(formatGaj(list.sumOf { it.stockOutYard }), colWidths[3], bold = true)
-        AggCell(sumKnown(list) { it.cashSale }, colWidths[4], bold = true)
-        AggCell(sumKnown(list) { it.creditSale }, colWidths[5], bold = true)
-        AggCell(sumKnown(list) { it.partyIncome }, colWidths[6], bold = true)
-        AggCell(formatTaka(net), colWidths[7], bold = true, color = if (net >= 0) AggGreen else AggRed)
-        AggCell(formatTaka(list.sumOf { it.gross }), colWidths[8], bold = true)
-        AggCell(formatTaka(list.sumOf { it.cashIn }), colWidths[9], bold = true)
-        AggCell(formatTaka(list.sumOf { it.cashOut }), colWidths[10], bold = true)
+        cells.forEachIndexed { i, v ->
+            AggCell(
+                v, colWidths[i + 1], bold = true,
+                color = if (i == 6) (if (net >= 0) AggGreen else AggRed) else Color(0xFF141413)
+            )
+        }
+    }
+}
+
+/** সব টেবিলে একই কলাম-চওড়া: হেডার, সব সপ্তাহের লেবেল/মান ও মোট-রোর সবচেয়ে চওড়া লেখা মেপে বের করা হয় */
+@Composable
+private fun rememberColWidths(
+    headers: List<String>,
+    weekReports: List<WeeklyReport>,
+    allReports: List<WeeklyReport>
+): List<androidx.compose.ui.unit.Dp> {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val monthTotals = weekReports.groupBy { monthKeyOf(it) }.values.map { totalCells(it) }
+    val grand = totalCells(allReports)
+    return remember(weekReports, allReports, density) {
+        val style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        fun measure(t: String): androidx.compose.ui.unit.Dp =
+            with(density) { measurer.measure(t, style, maxLines = 1, softWrap = false).size.width.toDp() }
+        val minW = 60.dp
+        headers.indices.map { col ->
+            val texts = ArrayList<String>()
+            texts += headers[col]
+            if (col == 0) {
+                weekReports.forEach { texts += it.label.ifBlank { "—" } }
+                texts += "মাসের মোট"; texts += "সর্বমোট"
+            } else {
+                weekReports.forEach { texts += it.cellValues()[col - 1] }
+                monthTotals.forEach { texts += it[col - 1] }
+                texts += grand[col - 1]
+            }
+            val widest = texts.maxOf { measure(it) }
+            // প্যাডিং (৬+৬) + বর্ডার + সামান্য বাড়তি
+            maxOf(minW, widest + 20.dp)
+        }
     }
 }
 
