@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.imran.clothstore.data.model.WeeklyReport
 import com.imran.clothstore.ui.theme.AppColors
+import com.imran.clothstore.util.toBengaliDigits
+import java.util.Calendar
 
 /**
  * ওয়েব অ্যাপের aggOverlay (Aggregate Report) এর সরাসরি Kotlin/Compose সংস্করণ।
@@ -56,12 +58,12 @@ fun AggregateReportOverlay(
     val reports by viewModel.reportsNewestFirst.collectAsState()
     var deleteMode by remember { mutableStateOf(false) }
 
-    val sumInStock = reports.sumOf { it.stockInYard }
-    val sumOutStock = reports.sumOf { it.stockOutYard }
-    val sumNet = reports.sumOf { it.net }
-    val sumGross = reports.sumOf { it.gross }
-    val sumIn = reports.sumOf { it.cashIn }
-    val sumOut = reports.sumOf { it.cashOut }
+
+    // প্রতিটা মাস আলাদা টেবিল — নতুন মাস আগে, প্রতি মাসের ভেতরে নতুন সপ্তাহ আগে
+    val months = remember(reports) {
+        reports.groupBy { monthKeyOf(it) }
+            .entries.sortedByDescending { it.key.first * 12 + it.key.second }
+    }
 
     // পার্টি লেজারের কাঠামো: সাদা সমান হেডার (স্ট্যাটাস বারের নিচে) → সমান বডি → এক্সেল গ্রিড টেবিল
     Column(
@@ -113,55 +115,69 @@ fun AggregateReportOverlay(
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 92.dp)
-            val headers = listOf("সপ্তাহ", "ইন-স্টক", "আউট-স্টক", "নেট", "গ্রস", "ক্যাশ-ইন", "ক্যাশ-আউট")
+            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 92.dp, 88.dp, 88.dp, 88.dp, 92.dp)
+            val headers = listOf(
+                "সপ্তাহ", "ইন-স্টক", "ক্রয় মূল্য", "আউট-স্টক", "নগদ বিক্রি", "বাকি বিক্রি",
+                "আমদানি", "নেট", "গ্রস", "ক্যাশ-ইন", "ক্যাশ-আউট"
+            )
+            val tableWidth = colWidths.fold(0.dp) { acc, w -> acc + w }
 
-            // মেইন হেডার রো — সবুজ, সাদা বোল্ড লেখা (পার্টি লেজার/ডিটেইলের মতো)
-            Row(modifier = Modifier.background(AggHeaderBg).height(34.dp)) {
-                headers.forEachIndexed { i, h ->
-                    Box(
-                        modifier = Modifier.width(colWidths[i]).fillMaxHeight().border(0.5.dp, AggHeaderGrid),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = h,
-                            modifier = Modifier.padding(horizontal = 6.dp),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            softWrap = false
+            // প্রতিটা মাসের টেবিল: ডিভাইডার ব্যান্ড → সবুজ হেডার → সপ্তাহের সারি → মাসের মোট
+            LazyColumn(modifier = Modifier.width(tableWidth).weight(1f, fill = false)) {
+                months.forEach { (key, monthReports) ->
+                    item(key = "month_${key.first}_${key.second}") {
+                        Column {
+                            // ডিভাইডার — এক মাসের টেবিল থেকে আরেক মাসের টেবিল আলাদা করে
+                            Box(
+                                modifier = Modifier
+                                    .width(tableWidth)
+                                    .height(10.dp)
+                                    .background(Color(0xFFEFEDE6))
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .width(tableWidth)
+                                    .background(AggMonthBg)
+                                    .padding(horizontal = 10.dp, vertical = 7.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = monthTitle(key),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1E3A32)
+                                )
+                                Text(
+                                    text = "  •  ${monthReports.size} সপ্তাহ".toBengaliDigits(),
+                                    fontSize = 10.sp,
+                                    color = Color(0xFF6C6A64)
+                                )
+                            }
+                            AggHeaderRow(headers, colWidths)
+                        }
+                    }
+                    // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
+                    itemsIndexed(
+                        monthReports,
+                        key = { index, it -> "${it.id}_${it.ts}_$index" }
+                    ) { index, report ->
+                        AggReportRow(
+                            report = report,
+                            rowIndex = index,
+                            colWidths = colWidths,
+                            deleteMode = deleteMode,
+                            onLongPress = { deleteMode = true },
+                            onDelete = { viewModel.deleteReport(report.id) }
                         )
+                    }
+                    item(key = "total_${key.first}_${key.second}") {
+                        AggTotalRow("মাসের মোট", monthReports, colWidths, AggMonthTotalBg)
                     }
                 }
             }
 
-            // চওড়া = কলামগুলোর যোগফল (অনুভূমিক স্ক্রলের ভেতরে অসীম প্রস্থ এড়াতে); সারি বেশি হলে ফুটার যেন নিচে থাকে
-            LazyColumn(modifier = Modifier.width(colWidths.fold(0.dp) { acc, w -> acc + w }).weight(1f, fill = false)) {
-                // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
-                itemsIndexed(reports, key = { index, it -> "${it.id}_${it.ts}_$index" }) { index, report ->
-                    AggReportRow(
-                        report = report,
-                        rowIndex = index,
-                        colWidths = colWidths,
-                        deleteMode = deleteMode,
-                        onLongPress = { deleteMode = true },
-                        onDelete = { viewModel.deleteReport(report.id) }
-                    )
-                }
-            }
-
             // ── ফুটার টোটাল — গ্রিডের শেষ রো ──
-            Row(modifier = Modifier.background(Color(0xFFE9E4D4)).height(IntrinsicSize.Min)) {
-                AggCell("সর্বমোট", colWidths[0], bold = true, align = TextAlign.Start)
-                AggCell(formatGaj(sumInStock), colWidths[1], bold = true)
-                AggCell(formatGaj(sumOutStock), colWidths[2], bold = true)
-                AggCell(formatTaka(sumNet), colWidths[3], bold = true, color = if (sumNet >= 0) AggGreen else AggRed)
-                AggCell(formatTaka(sumGross), colWidths[4], bold = true)
-                AggCell(formatTaka(sumIn), colWidths[5], bold = true)
-                AggCell(formatTaka(sumOut), colWidths[6], bold = true)
-            }
+            AggTotalRow("সর্বমোট", reports, colWidths, Color(0xFFE9E4D4))
         }
 
         if (deleteMode) {
@@ -189,6 +205,8 @@ private val AggHeaderGrid = Color(0xFF3B5A50)
 private val AggGrid = Color(0xFFCFCBC0)
 private val AggGreen = Color(0xFF2BB673)
 private val AggRed = Color(0xFFD9452B)
+private val AggMonthBg = Color(0xFFE3EDE8)
+private val AggMonthTotalBg = Color(0xFFF1EEE2)
 
 /** এক্সেল গ্রিডের একটা ঘর — বর্ডারসহ, রো-র সমান উচ্চতা */
 @Composable
@@ -217,6 +235,88 @@ private fun AggCell(
     }
 }
 
+/** এক মাসের টেবিলের সবুজ হেডার রো */
+@Composable
+private fun AggHeaderRow(headers: List<String>, colWidths: List<androidx.compose.ui.unit.Dp>) {
+    Row(modifier = Modifier.background(AggHeaderBg).height(34.dp)) {
+        headers.forEachIndexed { i, h ->
+            Box(
+                modifier = Modifier.width(colWidths[i]).fillMaxHeight().border(0.5.dp, AggHeaderGrid),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = h,
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
+        }
+    }
+}
+
+/** পুরনো এন্ট্রিতে নগদ/বাকি বিক্রি ও ক্রয় মূল্য আলাদা করে সেভ করা ছিল না — সেগুলোর ঘরে "—" দেখাবে */
+private fun WeeklyReport.isLegacy(): Boolean = cashSale == 0.0 && creditSale == 0.0 && sales > 0.0
+
+private fun WeeklyReport.cellValues(): List<String> {
+    val legacy = isLegacy()
+    return listOf(
+        formatGaj(stockInYard),
+        if (legacy) "—" else formatTaka(purchaseTotal),
+        formatGaj(stockOutYard),
+        if (legacy) "—" else formatTaka(cashSale),
+        if (legacy) "—" else formatTaka(creditSale),
+        formatTaka(sales),
+        formatTaka(net),
+        formatTaka(gross),
+        formatTaka(cashIn),
+        formatTaka(cashOut)
+    )
+}
+
+/** মাসের মোট / সর্বমোট রো — কলামের ক্রম রো-এর মতোই */
+@Composable
+private fun AggTotalRow(
+    title: String,
+    list: List<WeeklyReport>,
+    colWidths: List<androidx.compose.ui.unit.Dp>,
+    bg: Color
+) {
+    val net = list.sumOf { it.net }
+    Row(modifier = Modifier.background(bg).height(IntrinsicSize.Min)) {
+        AggCell(title, colWidths[0], bold = true, align = TextAlign.Start)
+        AggCell(formatGaj(list.sumOf { it.stockInYard }), colWidths[1], bold = true)
+        AggCell(formatTaka(list.sumOf { it.purchaseTotal }), colWidths[2], bold = true)
+        AggCell(formatGaj(list.sumOf { it.stockOutYard }), colWidths[3], bold = true)
+        AggCell(formatTaka(list.sumOf { it.cashSale }), colWidths[4], bold = true)
+        AggCell(formatTaka(list.sumOf { it.creditSale }), colWidths[5], bold = true)
+        AggCell(formatTaka(list.sumOf { it.sales }), colWidths[6], bold = true)
+        AggCell(formatTaka(net), colWidths[7], bold = true, color = if (net >= 0) AggGreen else AggRed)
+        AggCell(formatTaka(list.sumOf { it.gross }), colWidths[8], bold = true)
+        AggCell(formatTaka(list.sumOf { it.cashIn }), colWidths[9], bold = true)
+        AggCell(formatTaka(list.sumOf { it.cashOut }), colWidths[10], bold = true)
+    }
+}
+
+private val BnMonths = listOf(
+    "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+    "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
+)
+
+/** (বছর, মাস 0-11) — year সেভ না থাকলে ts থেকে বের করা হয় */
+private fun monthKeyOf(r: WeeklyReport): Pair<Int, Int> {
+    if (r.year > 0 && r.month in 0..11) return r.year to r.month
+    val cal = Calendar.getInstance().apply { timeInMillis = r.ts }
+    return cal.get(Calendar.YEAR) to cal.get(Calendar.MONTH)
+}
+
+private fun monthTitle(key: Pair<Int, Int>): String =
+    "${BnMonths[key.second]} ${key.first}".toBengaliDigits()
+
 @Composable
 private fun AggReportRow(
     report: WeeklyReport,
@@ -227,6 +327,7 @@ private fun AggReportRow(
     onDelete: () -> Unit
 ) {
     val rowBg = if (rowIndex % 2 == 0) Color.White else Color(0xFFF7F5EF)
+    val values = report.cellValues()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,6 +336,7 @@ private fun AggReportRow(
             .combinedClickable(onClick = {}, onLongClick = onLongPress),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // সপ্তাহ কলাম আগের মতোই (লেবেল / ডিলিট মোডে ডিলিট আইকন)
         if (deleteMode) {
             Box(
                 modifier = Modifier.width(colWidths[0]).fillMaxHeight().border(0.5.dp, AggGrid),
@@ -247,11 +349,12 @@ private fun AggReportRow(
         } else {
             AggCell(report.label.ifBlank { "—" }, colWidths[0], align = TextAlign.Start)
         }
-        AggCell(formatGaj(report.stockInYard), colWidths[1])
-        AggCell(formatGaj(report.stockOutYard), colWidths[2])
-        AggCell(formatTaka(report.net), colWidths[3], color = if (report.net >= 0) AggGreen else AggRed)
-        AggCell(formatTaka(report.gross), colWidths[4])
-        AggCell(formatTaka(report.cashIn), colWidths[5])
-        AggCell(formatTaka(report.cashOut), colWidths[6])
+        values.forEachIndexed { i, v ->
+            val isNet = i == 6
+            AggCell(
+                v, colWidths[i + 1],
+                color = if (isNet) (if (report.net >= 0) AggGreen else AggRed) else Color(0xFF141413)
+            )
+        }
     }
 }

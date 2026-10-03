@@ -41,5 +41,13 @@ data class WeeklyReport(
 
     // ── স্টক (গজ/ইয়ার্ড) ──
     val stockInYard: Double = 0.0,
-    val stockOutYard: Double = 0.0
+    val stockOutYard: Double = 0.0,
+
+    // ── Aggregate Report-এর নতুন কলামের জন্য (পুরনো এন্ট্রিতে ০ থাকবে) ──
+    /** ক্রয় মূল্য = নগদ ক্রয় + বাকি ক্রয় */
+    val purchaseTotal: Double = 0.0,
+    /** নগদ বিক্রি */
+    val cashSale: Double = 0.0,
+    /** বাকি বিক্রি */
+    val creditSale: Double = 0.0
 )

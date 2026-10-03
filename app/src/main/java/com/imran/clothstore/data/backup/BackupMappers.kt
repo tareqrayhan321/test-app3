@@ -37,14 +37,16 @@ fun BackupWeeklyReport.toWeeklyReport(): WeeklyReport = WeeklyReport(
     id = id, label = label, ts = ts, year = year, week = week, month = month,
     sales = sales, cogs = cogs, gross = gross, opex = opex, fixed = fixed, zakat = zakat, net = net,
     cashIn = cashIn, cashOut = cashOut, cashPurchase = cashPurchase, oldDebt = oldDebt,
-    cashProfit = cashProfit, stockInYard = stockInYard, stockOutYard = stockOutYard
+    cashProfit = cashProfit, stockInYard = stockInYard, stockOutYard = stockOutYard,
+    purchaseTotal = purchaseTotal, cashSale = cashSale, creditSale = creditSale
 )
 
 fun WeeklyReport.toBackupWeeklyReport(): BackupWeeklyReport = BackupWeeklyReport(
     id = id, label = label, ts = ts, year = year, week = week, month = month,
     sales = sales, cogs = cogs, gross = gross, opex = opex, fixed = fixed, zakat = zakat, net = net,
     cashIn = cashIn, cashOut = cashOut, cashPurchase = cashPurchase, oldDebt = oldDebt,
-    cashProfit = cashProfit, stockInYard = stockInYard, stockOutYard = stockOutYard
+    cashProfit = cashProfit, stockInYard = stockInYard, stockOutYard = stockOutYard,
+    purchaseTotal = purchaseTotal, cashSale = cashSale, creditSale = creditSale
 )
 
 fun BackupFabricGroup.toFabricGroup(): FabricGroup = FabricGroup(

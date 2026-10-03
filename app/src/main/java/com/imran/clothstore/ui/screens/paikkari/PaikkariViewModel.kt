@@ -98,7 +98,10 @@ class PaikkariViewModel(
             oldDebt = i.oldDebt,
             cashProfit = result.cashProfit,
             stockInYard = i.stockInYard,
-            stockOutYard = i.soldGaj
+            stockOutYard = i.soldGaj,
+            purchaseTotal = i.cashPurchase + i.creditPurchase,
+            cashSale = i.cashSale,
+            creditSale = i.creditSale
         )
 
         viewModelScope.launch {

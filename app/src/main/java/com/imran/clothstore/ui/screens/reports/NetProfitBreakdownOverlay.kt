@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -52,14 +53,15 @@ fun NetProfitBreakdownOverlay(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(AppColors.HeaderTeal)
-                .padding(16.dp),
+                .background(Color.White)
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Weekly Net Profit/Loss", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text("Weekly Net Profit/Loss", color = Color(0xFF1A1A1A), fontSize = 17.sp, fontWeight = FontWeight.Bold)
             IconButton(onClick = onClose) {
-                Icon(Icons.Filled.Close, contentDescription = "বন্ধ করুন", tint = Color.White)
+                Icon(Icons.Filled.Close, contentDescription = "বন্ধ করুন", tint = Color(0xFF1A1A1A))
             }
         }
 
