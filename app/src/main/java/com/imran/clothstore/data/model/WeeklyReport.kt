@@ -49,5 +49,7 @@ data class WeeklyReport(
     /** নগদ বিক্রি */
     val cashSale: Double = 0.0,
     /** বাকি বিক্রি */
-    val creditSale: Double = 0.0
+    val creditSale: Double = 0.0,
+    /** পার্টি আমদানি = পুরনো বাকি আদায় */
+    val oldCollection: Double = 0.0
 )

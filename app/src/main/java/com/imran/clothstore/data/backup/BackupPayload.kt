@@ -147,5 +147,6 @@ data class BackupWeeklyReport(
     val stockOutYard: Double = 0.0,
     val purchaseTotal: Double = 0.0,
     val cashSale: Double = 0.0,
-    val creditSale: Double = 0.0
+    val creditSale: Double = 0.0,
+    val oldCollection: Double = 0.0
 )

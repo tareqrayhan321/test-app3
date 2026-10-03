@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,7 +48,7 @@ import java.util.Calendar
 
 /**
  * ওয়েব অ্যাপের aggOverlay (Aggregate Report) এর সরাসরি Kotlin/Compose সংস্করণ।
- * প্রতিটা সপ্তাহের রিপোর্ট এক রো — ইন-স্টক, আউট-স্টক, নেট, গ্রস, ক্যাশ-ইন, ক্যাশ-আউট।
+ * প্রতিটা সপ্তাহের রিপোর্ট এক রো — ইন-স্টক, আউট-স্টক, নেট, গ্রস, ইন-ফ্লো, আউট-ফ্লো।
  * লং-প্রেসে ডিলিট মোড চালু হয় (aggOvToggleDelMode এর সমতুল্য)।
  */
 @Composable
@@ -115,16 +116,17 @@ fun AggregateReportOverlay(
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 92.dp, 88.dp, 88.dp, 88.dp, 92.dp)
+            val colWidths = listOf(96.dp, 84.dp, 88.dp, 88.dp, 88.dp, 88.dp, 108.dp, 88.dp, 88.dp, 88.dp, 92.dp)
             val headers = listOf(
                 "সপ্তাহ", "ইন-স্টক", "ক্রয় মূল্য", "আউট-স্টক", "নগদ বিক্রি", "বাকি বিক্রি",
-                "আমদানি", "নেট", "গ্রস", "ক্যাশ-ইন", "ক্যাশ-আউট"
+                "পার্টি আমদানি", "নেট", "গ্রস", "ইন-ফ্লো", "আউট-ফ্লো"
             )
             val tableWidth = colWidths.fold(0.dp) { acc, w -> acc + w }
 
             // প্রতিটা মাসের টেবিল: ডিভাইডার ব্যান্ড → সবুজ হেডার → সপ্তাহের সারি → মাসের মোট
             LazyColumn(modifier = Modifier.width(tableWidth).weight(1f, fill = false)) {
                 months.forEach { (key, monthReports) ->
+                    val theme = monthTheme(key.second)
                     item(key = "month_${key.first}_${key.second}") {
                         Column {
                             // ডিভাইডার — এক মাসের টেবিল থেকে আরেক মাসের টেবিল আলাদা করে
@@ -137,7 +139,7 @@ fun AggregateReportOverlay(
                             Row(
                                 modifier = Modifier
                                     .width(tableWidth)
-                                    .background(AggMonthBg)
+                                    .background(theme.light)
                                     .padding(horizontal = 10.dp, vertical = 7.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -145,7 +147,7 @@ fun AggregateReportOverlay(
                                     text = monthTitle(key),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF1E3A32)
+                                    color = theme.dark
                                 )
                                 Text(
                                     text = "  •  ${monthReports.size} সপ্তাহ".toBengaliDigits(),
@@ -153,7 +155,7 @@ fun AggregateReportOverlay(
                                     color = Color(0xFF6C6A64)
                                 )
                             }
-                            AggHeaderRow(headers, colWidths)
+                            AggHeaderRow(headers, colWidths, theme.dark, lerp(theme.dark, Color.White, 0.25f))
                         }
                     }
                     // ট্যাপে অ্যাপ বন্ধ হওয়ার কারণ: একাধিক রিপোর্টের id একই (বা ০) হলে LazyColumn key ক্র্যাশ করত
@@ -205,7 +207,6 @@ private val AggHeaderGrid = Color(0xFF3B5A50)
 private val AggGrid = Color(0xFFCFCBC0)
 private val AggGreen = Color(0xFF2BB673)
 private val AggRed = Color(0xFFD9452B)
-private val AggMonthBg = Color(0xFFE3EDE8)
 private val AggMonthTotalBg = Color(0xFFF1EEE2)
 
 /** এক্সেল গ্রিডের একটা ঘর — বর্ডারসহ, রো-র সমান উচ্চতা */
@@ -237,11 +238,16 @@ private fun AggCell(
 
 /** এক মাসের টেবিলের সবুজ হেডার রো */
 @Composable
-private fun AggHeaderRow(headers: List<String>, colWidths: List<androidx.compose.ui.unit.Dp>) {
-    Row(modifier = Modifier.background(AggHeaderBg).height(34.dp)) {
+private fun AggHeaderRow(
+    headers: List<String>,
+    colWidths: List<androidx.compose.ui.unit.Dp>,
+    bg: Color,
+    grid: Color
+) {
+    Row(modifier = Modifier.background(bg).height(34.dp)) {
         headers.forEachIndexed { i, h ->
             Box(
-                modifier = Modifier.width(colWidths[i]).fillMaxHeight().border(0.5.dp, AggHeaderGrid),
+                modifier = Modifier.width(colWidths[i]).fillMaxHeight().border(0.5.dp, grid),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -259,23 +265,45 @@ private fun AggHeaderRow(headers: List<String>, colWidths: List<androidx.compose
     }
 }
 
-/** পুরনো এন্ট্রিতে নগদ/বাকি বিক্রি ও ক্রয় মূল্য আলাদা করে সেভ করা ছিল না — সেগুলোর ঘরে "—" দেখাবে */
-private fun WeeklyReport.isLegacy(): Boolean = cashSale == 0.0 && creditSale == 0.0 && sales > 0.0
+/** এক সপ্তাহের নতুন কলামগুলোর মান — null মানে ডাটা পাওয়া যায়নি ("—" দেখাবে) */
+private class AggVals(
+    val purchase: Double?,
+    val cashSale: Double?,
+    val creditSale: Double?,
+    val partyIncome: Double?
+)
+
+/**
+ * সাপ্তাহিক হালনাগাদ থেকে সেভ করার সময়ই ক্রয় মূল্য, নগদ বিক্রি, বাকি বিক্রি ও পার্টি আমদানি (পুরনো বাকি আদায়)
+ * আলাদা করে রাখা হয়। যে পুরনো সপ্তাহে এগুলো সেভ ছিল না, সেখানে কোনো হিসাব না করে "—" দেখাবে।
+ */
+private fun WeeklyReport.resolved(): AggVals {
+    val saved = cashSale != 0.0 || creditSale != 0.0 || purchaseTotal != 0.0 || oldCollection != 0.0
+    return if (saved) AggVals(purchaseTotal, cashSale, creditSale, oldCollection)
+    else AggVals(null, null, null, null)
+}
 
 private fun WeeklyReport.cellValues(): List<String> {
-    val legacy = isLegacy()
+    val v = resolved()
+    fun t(x: Double?) = if (x == null) "—" else formatTaka(x)
     return listOf(
         formatGaj(stockInYard),
-        if (legacy) "—" else formatTaka(purchaseTotal),
+        t(v.purchase),
         formatGaj(stockOutYard),
-        if (legacy) "—" else formatTaka(cashSale),
-        if (legacy) "—" else formatTaka(creditSale),
-        formatTaka(sales),
+        t(v.cashSale),
+        t(v.creditSale),
+        t(v.partyIncome),
         formatTaka(net),
         formatTaka(gross),
         formatTaka(cashIn),
         formatTaka(cashOut)
     )
+}
+
+/** যোগফল — যেসব সপ্তাহে ডাটা নেই সেগুলো বাদ; কোনোটাতেই না থাকলে "—" */
+private fun sumKnown(list: List<WeeklyReport>, pick: (AggVals) -> Double?): String {
+    val xs = list.mapNotNull { pick(it.resolved()) }
+    return if (xs.isEmpty()) "—" else formatTaka(xs.sum())
 }
 
 /** মাসের মোট / সর্বমোট রো — কলামের ক্রম রো-এর মতোই */
@@ -290,17 +318,37 @@ private fun AggTotalRow(
     Row(modifier = Modifier.background(bg).height(IntrinsicSize.Min)) {
         AggCell(title, colWidths[0], bold = true, align = TextAlign.Start)
         AggCell(formatGaj(list.sumOf { it.stockInYard }), colWidths[1], bold = true)
-        AggCell(formatTaka(list.sumOf { it.purchaseTotal }), colWidths[2], bold = true)
+        AggCell(sumKnown(list) { it.purchase }, colWidths[2], bold = true)
         AggCell(formatGaj(list.sumOf { it.stockOutYard }), colWidths[3], bold = true)
-        AggCell(formatTaka(list.sumOf { it.cashSale }), colWidths[4], bold = true)
-        AggCell(formatTaka(list.sumOf { it.creditSale }), colWidths[5], bold = true)
-        AggCell(formatTaka(list.sumOf { it.sales }), colWidths[6], bold = true)
+        AggCell(sumKnown(list) { it.cashSale }, colWidths[4], bold = true)
+        AggCell(sumKnown(list) { it.creditSale }, colWidths[5], bold = true)
+        AggCell(sumKnown(list) { it.partyIncome }, colWidths[6], bold = true)
         AggCell(formatTaka(net), colWidths[7], bold = true, color = if (net >= 0) AggGreen else AggRed)
         AggCell(formatTaka(list.sumOf { it.gross }), colWidths[8], bold = true)
         AggCell(formatTaka(list.sumOf { it.cashIn }), colWidths[9], bold = true)
         AggCell(formatTaka(list.sumOf { it.cashOut }), colWidths[10], bold = true)
     }
 }
+
+/** প্রতি মাসের নিজস্ব রঙ — dark = টেবিল হেডার/মাসের নাম, light = মাসের ব্যান্ড। ১২ মাস ১২ রকম, নরম ও চোখে আরামদায়ক */
+private class MonthTheme(val dark: Color, val light: Color)
+
+private val MonthThemes = listOf(
+    MonthTheme(Color(0xFF2F4A6D), Color(0xFFE4EBF4)), // জানুয়ারি — নীলচে স্লেট
+    MonthTheme(Color(0xFF5B3A6B), Color(0xFFEEE5F2)), // ফেব্রুয়ারি — বেগুনি
+    MonthTheme(Color(0xFF1E5F6B), Color(0xFFE0EFF1)), // মার্চ — টিল
+    MonthTheme(Color(0xFF2F6B3A), Color(0xFFE5F1E7)), // এপ্রিল — সবুজ
+    MonthTheme(Color(0xFF5E6B2A), Color(0xFFEEF1DE)), // মে — জলপাই
+    MonthTheme(Color(0xFF8A5A14), Color(0xFFF6EBD8)), // জুন — অ্যাম্বার
+    MonthTheme(Color(0xFF9A4A2E), Color(0xFFF6E6DF)), // জুলাই — টেরাকোটা
+    MonthTheme(Color(0xFF9A3B57), Color(0xFFF5E3E8)), // আগস্ট — গোলাপি-মেরুন
+    MonthTheme(Color(0xFF1E3A32), Color(0xFFE3EDE8)), // সেপ্টেম্বর — গাঢ় সবুজ (আগের রঙ)
+    MonthTheme(Color(0xFF3F3F8F), Color(0xFFE7E7F5)), // অক্টোবর — ইন্ডিগো
+    MonthTheme(Color(0xFF5A4636), Color(0xFFEDE6E0)), // নভেম্বর — কোকো
+    MonthTheme(Color(0xFF4A5568), Color(0xFFE8EAEE))  // ডিসেম্বর — গ্রাফাইট
+)
+
+private fun monthTheme(month: Int): MonthTheme = MonthThemes[month.coerceIn(0, 11)]
 
 private val BnMonths = listOf(
     "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
