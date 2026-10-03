@@ -71,7 +71,7 @@ class ClothStoreApplication : Application() {
         try {
             backupListener?.remove()
             backupListener = BackupRepository().addRemoteSnapshotListener(
-                onChange = { _ -> SyncWorker.triggerImmediate(applicationContext) },
+                onChange = { _ -> SyncWorker.triggerFromRemote(applicationContext) },
                 onError = { error ->
                     Log.e(TAG, "Firestore backup listener failed", error)
                     SyncStatus.setRealtimeActive(false)

@@ -61,7 +61,12 @@ class BackupRepository(
     suspend fun fetchRemoteOnce(): BackupPayload {
         val snapshot = docRef.get().await()
         return if (snapshot.exists()) {
-            snapshot.toObject(BackupPayload::class.java) ?: BackupPayload()
+            try {
+                snapshot.toObject(BackupPayload::class.java) ?: BackupPayload()
+            } catch (e: RuntimeException) {
+                // ডকুমেন্টের কোনো ফিল্ডের ধরন অ্যাপের মডেলের সাথে না মিললে এখানে ধরা পড়ে — কারণসহ জানানো হয়
+                throw IllegalStateException("ফায়ারস্টোরের ডকুমেন্ট পড়া যায়নি: ${e.message}", e)
+            }
         } else {
             BackupPayload()
         }
@@ -83,6 +88,9 @@ class BackupRepository(
         if (error != null) {
             onError(error)
         } else if (snapshot != null) {
+            // নিজের লেখা (সার্ভারে এখনো নিশ্চিত হয়নি) বা ক্যাশ থেকে আসা ইভেন্টে sync চালালে চলমান push বাতিল হয়ে
+            // লুপ তৈরি হতো — তাই শুধু সার্ভার-নিশ্চিত remote পরিবর্তনেই সাড়া দেওয়া হয়
+            if (snapshot.metadata.hasPendingWrites() || snapshot.metadata.isFromCache) return@addSnapshotListener
             val payload = if (snapshot.exists()) {
                 snapshot.toObject(BackupPayload::class.java)
             } else {
