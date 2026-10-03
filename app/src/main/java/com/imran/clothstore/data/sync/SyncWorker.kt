@@ -12,10 +12,15 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.imran.clothstore.data.backup.BackupPayload
 import com.imran.clothstore.data.backup.BackupRepository
 import com.imran.clothstore.data.local.AppDatabase
 import com.imran.clothstore.data.local.LocalCacheRepository
+import com.imran.clothstore.ui.screens.notif.NotificationCenter
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
 import java.util.concurrent.TimeUnit
 
 /**
@@ -39,6 +44,8 @@ class SyncWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        // ইউজারের নিজের পেন্ডিং পরিবর্তন থাকলেই কেবল সাফল্য/ব্যর্থতার নোটিফিকেশন দেওয়া হয় (শুধু pull হলে নয়)
+        var hasPending = false
         return try {
             val db = AppDatabase.getInstance(applicationContext)
             val local = LocalCacheRepository(db.backupCacheDao())
@@ -53,7 +60,7 @@ class SyncWorker(
             
             val repository = BackupRepository(local, applicationContext)
 
-            val hasPending = local.hasPendingSync()
+            hasPending = local.hasPendingSync()
             val localPayload = local.getOnce()
             val remotePayload = try {
                 repository.fetchRemoteOnce()
@@ -61,6 +68,7 @@ class SyncWorker(
                 // নেটওয়ার্ক নেই বা Firestore আনরিচেবল — এখনো কিছু push করা যায়নি,
                 // পরে আবার চেষ্টা করার জন্য retry() রিটার্ন করা হচ্ছে
                 Log.w(TAG, "Could not read the remote backup; retrying", e)
+                if (hasPending) notifyFailure(e)
                 return Result.retry()
             }
             Log.i(
@@ -76,7 +84,15 @@ class SyncWorker(
             }
 
             if (hasPending) {
-                repository.pushToRemote(merged)
+                // set().await() শুধু সার্ভার নিশ্চিত করলেই শেষ হয়; অফলাইনে চিরকাল ঝুলে থাকত — তাই টাইমআউট
+                try {
+                    withTimeout(PUSH_TIMEOUT_MS) { repository.pushToRemote(merged) }
+                } catch (e: TimeoutCancellationException) {
+                    Log.w(TAG, "Firestore push timed out", e)
+                    notifyFailure(IllegalStateException("সার্ভার সাড়া দেয়নি (ইন্টারনেট ধীর বা বন্ধ)"))
+                    return Result.retry()
+                }
+                notifySuccess()
             }
             // নেটওয়ার্কে থাকাকালীন ইউজার নতুন কিছু এডিট করে থাকলে (updatedAt বাদে হুবহু তুলনা),
             // পুরনো merged দিয়ে সেটা ওভাররাইট করা হয় না এবং pendingSync-ও true-ই থাকে।
@@ -91,8 +107,12 @@ class SyncWorker(
             SyncStatus.markSynced(applicationContext)
 
             Result.success()
+        } catch (e: CancellationException) {
+            // নতুন সেভের কারণে এই কাজ বাতিল হলে সেটা ব্যর্থতা নয় — নতুন কাজ আবার চেষ্টা করবে
+            throw e
         } catch (e: Exception) {
             Log.e(TAG, "Backup sync failed; WorkManager will retry", e)
+            if (hasPending) notifyFailure(e)
             Result.retry()
         }
     }
@@ -101,6 +121,37 @@ class SyncWorker(
         private const val TAG = "BackupSyncWorker"
         private const val PERIODIC_WORK_NAME = "backup_sync_periodic"
         private const val ONE_TIME_WORK_NAME = "backup_sync_immediate"
+        private const val PUSH_TIMEOUT_MS = 20_000L
+
+        @Volatile private var lastErrorMsg = ""
+        @Volatile private var lastErrorAt = 0L
+
+        /** ফায়ারস্টোরে ডাটা সত্যিই পৌঁছালে নোটিফিকেশন প্যানেলে সফল মেসেজ */
+        private fun notifySuccess() {
+            lastErrorMsg = ""
+            NotificationCenter.push("success", "ফায়ারস্টোরে ডাটা সফলভাবে সেভ হয়েছে")
+        }
+
+        /** ব্যর্থ হলে কারণসহ মেসেজ — একই মেসেজ ৫ মিনিটের মধ্যে বারবার দেখানো হয় না (রিট্রাইয়ে স্প্যাম এড়াতে) */
+        private fun notifyFailure(e: Throwable) {
+            val msg = "ফায়ারস্টোরে সেভ ব্যর্থ: ${reasonOf(e)}"
+            val now = System.currentTimeMillis()
+            if (msg == lastErrorMsg && now - lastErrorAt < 5 * 60_000L) return
+            lastErrorMsg = msg
+            lastErrorAt = now
+            NotificationCenter.push("error", msg)
+        }
+
+        private fun reasonOf(e: Throwable): String {
+            val code = (e as? FirebaseFirestoreException)?.code
+            return when (code) {
+                FirebaseFirestoreException.Code.PERMISSION_DENIED -> "অনুমতি নেই (Firestore rules বা অ্যানোনিমাস লগইন সমস্যা)"
+                FirebaseFirestoreException.Code.UNAUTHENTICATED -> "লগইন হয়নি"
+                FirebaseFirestoreException.Code.UNAVAILABLE,
+                FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> "ইন্টারনেট বা সার্ভার পাওয়া যায়নি"
+                else -> (e.message ?: e::class.java.simpleName).take(90)
+            }
+        }
 
         /** ClothStoreApplication.onCreate() থেকে একবার কল হয় — প্রতি ১৫ মিনিটে ব্যাকগ্রাউন্ড pull/push */
         fun schedulePeriodic(context: Context) {
@@ -113,6 +164,25 @@ class SyncWorker(
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 PERIODIC_WORK_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
+        }
+
+        /**
+         * Firestore-এর remote পরিবর্তন জানালে ডাকা হয়। KEEP নীতি: চলমান/অপেক্ষমান push বাতিল করে না
+         * (আগে REPLACE হওয়ায় নিজের push-এর snapshot ইভেন্টেই push বাতিল হয়ে লুপ হতে পারত)।
+         */
+        fun triggerFromRemote(context: Context) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+            val request = OneTimeWorkRequestBuilder<SyncWorker>()
+                .setConstraints(constraints)
+                .setInitialDelay(2, TimeUnit.SECONDS)
+                .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                ONE_TIME_WORK_NAME,
+                ExistingWorkPolicy.KEEP,
                 request
             )
         }

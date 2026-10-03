@@ -109,10 +109,8 @@ class PaikkariViewModel(
             try {
                 repository.saveOrUpdateWeeklyReport(report.toBackupWeeklyReport())
                 repository.saveProfitStrip(net = result.netProfit, gross = result.gross)
-                com.imran.clothstore.ui.screens.notif.NotificationCenter.push(
-                    "success", "$label — ${formatTaka(result.netProfit)} সংরক্ষিত"
-                )
-                _savedMessage.value = "$label — ${formatTaka(result.netProfit)} সংরক্ষিত হয়েছে"
+                // ফায়ারস্টোরে পৌঁছানোর সফল/ব্যর্থ নোটিফিকেশন SyncWorker নিজেই দেয় — এখানে শুধু ফোনে সেভ হওয়ার কথা
+                _savedMessage.value = "$label — ${formatTaka(result.netProfit)} ফোনে সংরক্ষিত, ফায়ারস্টোরে পাঠানো হচ্ছে"
             } catch (e: Exception) {
                 com.imran.clothstore.ui.screens.notif.NotificationCenter.push(
                     "error", "সাপ্তাহিক হিসাব সেভ করতে ব্যর্থ: ${e.message}"
