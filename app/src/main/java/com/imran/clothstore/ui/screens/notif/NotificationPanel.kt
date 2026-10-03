@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
@@ -103,8 +104,20 @@ fun NotificationPanel(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    itemsIndexed(notifications, key = { index, it -> "${it.id}_$index" }) { _, notif ->
-                        NotifRow(notif)
+                    itemsIndexed(notifications, key = { index, it -> "${it.id}_$index" }) { index, notif ->
+                        androidx.compose.foundation.layout.Column {
+                            NotifRow(notif)
+                            // প্রতিটা নোটিফিকেশনের মাঝে হালকা ডিভাইডার (শেষটার নিচে নয়)
+                            if (index < notifications.lastIndex) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .background(Color(0xFFE6E3DA))
+                                )
+                            }
+                        }
                     }
                 }
             }
