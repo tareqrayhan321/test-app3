@@ -129,9 +129,7 @@ class DebtorsListViewModel(
             type = "joma", date = date, memo = "", joma = jomaAmount, note = note
         )
         val isCustomer = row.category.isCustomerType
-        val totalBill = entry.bill + entry.history.filter { it.type == "bokeyoa" }.sumOf { it.bokeyoaAmount(isCustomer) }
-        val totalJoma = entry.joma + newHistory.filter { it.type == "joma" }.sumOf { it.joma }
-        val netBaki = maxOf(0.0, totalBill - totalJoma)
+        val netBaki = com.imran.clothstore.ui.screens.detail.currentBaki(entry.copy(history = newHistory), isCustomer)
         val updated = entry.copy(history = newHistory, baki = netBaki)
 
         viewModelScope.launch {
