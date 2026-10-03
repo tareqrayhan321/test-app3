@@ -107,7 +107,7 @@ private fun ColumnScope.BokeyoaMiniForm(
         ) {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
-            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
+            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f), KeyboardType.Number)
         }
         Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(bill, { bill = it }, "বিল/বকেয়া", Modifier.weight(1f), KeyboardType.Decimal)
@@ -132,7 +132,6 @@ private fun ColumnScope.BokeyoaMiniForm(
 private fun ColumnScope.JomaMiniForm(
     onSave: (memo: String, date: String, joma: Double, note: String) -> Unit
 ) {
-    var memo by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
     var joma by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -151,17 +150,17 @@ private fun ColumnScope.JomaMiniForm(
                 .weight(1f, fill = false)
                 .verticalScroll(rememberScrollState())
         ) {
+        // তারিখ ও জমা আগের মতো অর্ধেক চওড়া; শুধু মন্তব্যের ঘর পুরো চওড়া
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppDateField(date, { date = it }, "তারিখ", Modifier.weight(1f))
-            AppTextField(memo, { memo = it }, "ম্যামো", Modifier.weight(1f))
-        }
-        Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             AppTextField(joma, { joma = it }, "জমা", Modifier.weight(1f), KeyboardType.Decimal)
-            AppTextField(note, { note = it }, "মন্তব্য", Modifier.weight(1f))
+        }
+        Row(modifier = Modifier.padding(top = 6.dp)) {
+            AppTextField(note, { note = it }, "মন্তব্য", Modifier.fillMaxWidth())
         }
         }
         Button(
-            onClick = { onSave(memo, date, joma.toDoubleOrNull() ?: 0.0, note) },
+            onClick = { onSave("", date, joma.toDoubleOrNull() ?: 0.0, note) },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(46.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AppColors.HeaderTeal)
         ) {
