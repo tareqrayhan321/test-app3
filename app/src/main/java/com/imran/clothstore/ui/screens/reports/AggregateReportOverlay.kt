@@ -261,6 +261,12 @@ private fun AggCell(
     }
 }
 
+/** মাসের নাম ব্যান্ডেই আছে, তাই সারিতে শুধু "সপ্তা-৩৯" অংশ দেখায় (লেবেলে "সপ্তা" না থাকলে পুরো লেবেল) */
+private fun WeeklyReport.weekText(): String {
+    val i = label.indexOf("সপ্তা")
+    return if (i >= 0) label.substring(i) else label.ifBlank { "—" }
+}
+
 /** এক মাসের টেবিলের সবুজ হেডার রো */
 @Composable
 private fun AggHeaderRow(
@@ -386,7 +392,7 @@ private fun rememberColWidths(
             val texts = ArrayList<String>()
             texts += headers[col]
             if (col == 0) {
-                weekReports.forEach { texts += it.label.ifBlank { "—" } }
+                weekReports.forEach { texts += it.weekText() }
                 texts += "মাসের মোট"; texts += "সর্বমোট"
             } else {
                 weekReports.forEach { texts += it.cellValues()[col - 1] }
@@ -456,7 +462,7 @@ private fun AggReportRow(
                 }
             }
         } else {
-            AggCell(report.label.ifBlank { "—" }, colWidths[0], align = TextAlign.Start)
+            AggCell(report.weekText(), colWidths[0], align = TextAlign.Start)
         }
         values.forEachIndexed { i, v ->
             val isNet = i == 6
