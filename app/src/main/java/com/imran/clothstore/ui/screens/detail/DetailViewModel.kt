@@ -145,16 +145,17 @@ class DetailViewModel(
         recalculateAndSave(e.copy(history = newHist))
     }
 
-    /** history-সহ পুরো এন্ট্রি থেকে মোট bill/joma/baki recalculate করে সেভ করে */
+    /** টেবিলের হিসাব (buildTransactionRows) থেকেই মোট বাকি বের করে সেভ করে — তাই তালিকার অঙ্ক সবসময় টেবিলের শেষ "মোট বাকি"-র সমান */
     private fun recalculateAndSave(updated: Entry) {
         val isCustomer = category.isCustomerType
-        val totalBill = updated.bill + updated.history
-            .filter { it.type == "bokeyoa" }
-            .sumOf { it.bokeyoaAmount(isCustomer) }
-        val totalJoma = updated.joma + updated.history.filter { it.type == "joma" }.sumOf { it.joma }
-        val netBaki = maxOf(0.0, totalBill - totalJoma)
+        val current = _entry.value
+        // মহাজনের initPawna না থাকলে (পুরনো এন্ট্রি) history-হীন অবস্থায় baki+joma-ই আসল পাওনা — এখনই স্থির করে রাখা হয়,
+        // নইলে লেনদেন যোগের পর baki বদলে ফলব্যাক ভুল হয়ে যেত
+        val pinned = if (!isCustomer && updated.initPawna == null && current.history.isEmpty()) {
+            updated.copy(initPawna = current.baki + current.joma)
+        } else updated
 
-        val finalEntry = updated.copy(baki = netBaki)
+        val finalEntry = pinned.copy(baki = currentBaki(pinned, isCustomer))
         _entry.value = finalEntry
 
         viewModelScope.launch {

@@ -79,9 +79,14 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
                 "joma" -> raw.add(RawTxn(h.date, h.memo, TxnType.JOMA, h.joma, "", h.note, idx))
             }
         }
-        // মহাজনের ক্ষেত্রে ওয়েব অ্যাপ তারিখ অনুযায়ী sort করে
-        raw.sortBy { it.date }
     }
+
+    // কাস্টমার ও মহাজন — দুই ক্ষেত্রেই তারিখ অনুযায়ী সাজানো (আগে শুধু মহাজনে হতো, তাই কাস্টমারে পরে
+    // বসানো আগের তারিখের লেনদেন শেষে চলে যেত)। sortedBy স্থিতিশীল: একই তারিখে ইনপুটের ক্রম বজায় থাকে।
+    // তারিখ ফাঁকা থাকলে সবার শেষে; "yyyy-MM-dd" ছাড়া সময়ের অংশ থাকলেও প্রথম ১০ অক্ষরই ধরা হয়।
+    val sortedRaw = raw.sortedBy { dateSortKey(it.date) }
+    raw.clear()
+    raw.addAll(sortedRaw)
 
     // ── একই (non-empty) মেমোর bill + joma একসাথে merge করি এক রো-তে দেখানোর জন্য ──
     // ওয়েব অ্যাপের fvOpenDetail() _mergeJoma প্যাটার্ন (index.html লাইন ৬১৫০-৬১৬৪) হুবহু অনুসরণ:
@@ -156,4 +161,33 @@ fun buildTransactionRows(entry: Entry, isCustomer: Boolean): List<TxnRow> {
             jomaSrc = t.mateSrc
         )
     }
+}
+
+/**
+ * এন্ট্রির বর্তমান বাকি — টেবিলের শেষ রো-র "মোট বাকি"-র সাথে হুবহু মেলে (একই হিসাব)।
+ * সেভ করা baki ফিল্ড পুরনো/ভুল হলেও (যেমন ওয়েব অ্যাপের মহাজন-এন্ট্রিতে প্রাথমিক পাওনা initPawna-য় থাকে,
+ * bill-এ নয়) তালিকা, হোম ও নেভবারে সঠিক অঙ্ক দেখানোর জন্য এটাই ব্যবহার হয়।
+ * কোনো রো না থাকলে সেভ করা baki-ই ফেরত দেয়।
+ */
+fun currentBaki(entry: Entry, isCustomer: Boolean): Double {
+    val rows = buildTransactionRows(entry, isCustomer)
+    return if (rows.isEmpty()) entry.baki else rows.last().runningBaki
+}
+
+/**
+ * তারিখকে "yyyy-MM-dd" সাজানোর কী-তে আনে। ওয়েব অ্যাপ বা পুরনো ডেটায় "d/M/yyyy" বা "dd-MM-yyyy" ফরম্যাটও থাকতে পারে —
+ * সরাসরি স্ট্রিং তুলনা করলে সেগুলো ভুল জায়গায় বসত। বুঝতে না পারলে বা ফাঁকা হলে সবার শেষে।
+ */
+private fun dateSortKey(raw: String): String {
+    val d = raw.trim()
+    if (d.isEmpty()) return "9999-99-99"
+    Regex("""^(\d{4})-(\d{1,2})-(\d{1,2})""").find(d)?.let {
+        val (y, m, day) = it.destructured
+        return "%s-%02d-%02d".format(y, m.toInt(), day.toInt())
+    }
+    Regex("""^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})""").find(d)?.let {
+        val (day, m, y) = it.destructured
+        return "%s-%02d-%02d".format(y, m.toInt(), day.toInt())
+    }
+    return "9999-99-99"
 }
